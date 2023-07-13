@@ -33,21 +33,11 @@ validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/S
 // ----------------------------------------------------------------------------
 
 var ContextBools = []cmdhelper.ContextBool{
-	{
-		Default: cmdhelper.OsLookupEnvBool(envar.EnableAll, false),
-		Envar:   envar.EnableAll,
-		Help:    help.EnableAll,
-		Option:  option.EnableAll,
-	},
+	// none defined
 }
 
 var ContextInts = []cmdhelper.ContextInt{
-	{
-		Default: cmdhelper.OsLookupEnvInt(envar.EngineLogLevel, 0),
-		Envar:   envar.EngineLogLevel,
-		Help:    help.EngineLogLevel,
-		Option:  option.EngineLogLevel,
-	},
+	// none defined
 }
 
 var ContextStrings = []cmdhelper.ContextString{
@@ -69,15 +59,15 @@ var ContextStrings = []cmdhelper.ContextString{
 		Help:    help.LogLevel,
 		Option:  option.LogLevel,
 	},
-}
+	{
+		Default: cmdhelper.OsLookupEnvString(envar.InputURL, ""),
+		Envar:   envar.InputURL,
+		Help:    help.InputURL,
+		Option:  option.InputURL,
+	}}
 
 var ContextStringSlices = []cmdhelper.ContextStringSlice{
-	{
-		Default: []string{},
-		Envar:   envar.XtermAllowedHostnames,
-		Help:    help.XtermAllowedHostnames,
-		Option:  option.XtermAllowedHostnames,
-	},
+	// none defined
 }
 
 var ContextVariables = &cmdhelper.ContextVariables{
