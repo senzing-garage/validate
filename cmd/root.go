@@ -15,11 +15,17 @@ import (
 )
 
 const (
-	Short string = "validate short description"
+	Short string = "Validates a JSON-lines file."
 	Use   string = "validate"
 	Long  string = `
-validate long description.
-    `
+Welcome to validate!
+Validate the each line of a JSON-lines (JSONL) file conforms to the Generic Entity Specification.
+
+Usage example:
+
+validate --input-url "file:///path/to/json/lines/file.jsonl"
+validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl"
+`
 )
 
 // ----------------------------------------------------------------------------
