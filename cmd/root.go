@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/senzing/senzing-tools/cmdhelper"
@@ -12,6 +13,7 @@ import (
 	"github.com/senzing/senzing-tools/option"
 	"github.com/senzing/validate/examplepackage"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -108,6 +110,21 @@ func PreRun(cobraCommand *cobra.Command, args []string) {
 func RunE(_ *cobra.Command, _ []string) error {
 	var err error = nil
 	ctx := context.Background()
+
+	inputURL := viper.GetString(option.InputURL)
+	inputURLLen := len(inputURL)
+
+	// if inputURLLen == 0 {
+	// 	//assume stdin
+	// 	return readStdin()
+	// }
+
+	//This assumes the URL includes a schema and path so, minimally:
+	//  "s://p" where the schema is 's' and 'p' is the complete path
+	if inputURLLen < 5 {
+		// logger.LogMessage(MessageIdFormat, 2002, fmt.Sprintf("Check the inputURL parameter: %s", inputURL))
+		return fmt.Errorf("Check the inputURL parameter: [%s]", inputURL)
+	}
 	examplePackage := &examplepackage.ExamplePackageImpl{
 		Something: "Main says 'Hi!'",
 	}
