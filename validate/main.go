@@ -27,7 +27,6 @@ const Prefix = "validate: "
 
 // Message templates for g2config implementations.
 var IdMessages = map[int]string{
-	2002: Prefix + "Check the input-url parameter: %s",
 	2003: Prefix + "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type).",
 	2004: Prefix + "If this is a valid JSONL resource, please rename with the .jsonl extension or use the file type override (--file-type).",
 	2200: Prefix + "Validating URL string: %s",
@@ -41,6 +40,7 @@ var IdMessages = map[int]string{
 	3003: Prefix + "%d line(s) are not well formed JSON-lines.",
 	3004: Prefix + "%d line(s) did not validate for an unknown reason.",
 	4001: Prefix + "Error: Unable to set log level to: %s",
+	4002: Prefix + "Error: Check the input-url parameter: %s",
 	5001: Prefix + "Fatal error parsing input-url.",
 	5002: Prefix + "Fatal error unable to handle %s input URLs.",
 	5003: Prefix + "Fatal error retrieving input-url: %s",

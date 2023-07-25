@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -16,6 +17,11 @@ func Test_ExecuteCommand_NoInputURL(t *testing.T) {
 	errbuf := bytes.NewBufferString("")
 	cmd.SetOut(outbuf)
 	cmd.SetErr(errbuf)
+	// log.SetOutput(outbuf)
+	// log.SetOutput(errbuf)
+	// defer func() {
+	// 	log.SetOutput(os.Stderr)
+	// }()
 	// cmd.SetArgs([]string{"--help"})
 	cmd.SetArgs([]string{"--input-url", "none"})
 	exError := RootCmd.Execute()
@@ -26,9 +32,14 @@ func Test_ExecuteCommand_NoInputURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// fmt.Println("stderr:", string(stderr))
+	stdout, err := ioutil.ReadAll(outbuf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("stderr:", string(stderr))
+	fmt.Println("stdout:", string(stdout))
 	if !strings.Contains(string(stderr), "Check the input-url parameter") {
-		t.Fatalf("expected inputURL parameter error")
+		t.Fatalf("expected input-url parameter error")
 	}
 }
 

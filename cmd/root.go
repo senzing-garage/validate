@@ -80,7 +80,7 @@ func RunE(_ *cobra.Command, _ []string) error {
 	}
 
 	if !validator.Read(ctx) {
-		err = errors.New("Validation failed.")
+		err = errors.New("validation failed.")
 	}
 	return err
 }

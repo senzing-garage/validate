@@ -62,7 +62,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	//This assumes the URL includes a schema and path so, minimally:
 	//  "s://p" where the schema is 's' and 'p' is the complete path
 	if inputURLLen < 5 {
-		v.log(2002, v.InputURL)
+		v.log(4002, v.InputURL)
 		return false
 	}
 
