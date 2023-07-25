@@ -27,7 +27,7 @@ func Test_ExecuteCommand_NoInputURL(t *testing.T) {
 		t.Fatal(err)
 	}
 	// fmt.Println("stderr:", string(stderr))
-	if !strings.Contains(string(stderr), "Error: Check the inputURL parameter") {
+	if !strings.Contains(string(stderr), "Check the input-url parameter") {
 		t.Fatalf("expected inputURL parameter error")
 	}
 }
