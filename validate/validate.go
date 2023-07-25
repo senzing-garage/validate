@@ -52,48 +52,37 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	//  "s://p" where the schema is 's' and 'p' is the complete path
 	if inputURLLen < 5 {
 		v.log(2002, v.InputURL)
-		// logger.LogMessage(MessageIdFormat, 2002, fmt.Sprintf("Check the inputURL parameter: %s", v.InputURL))
 		return false
 	}
 
-	// logger.LogMessage(MessageIdFormat, 1200, fmt.Sprintf("Validating URL string: %s", v.InputURL))
-	v.log(1200, v.InputURL)
+	v.log(2200, v.InputURL)
 	u, err := url.Parse(v.InputURL)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9001, "Fatal error parsing inputURL.", err)
-		v.log(9001, err)
+		v.log(4001, err)
 		return false
 	}
 	if u.Scheme == "file" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			// logger.LogMessage(MessageIdFormat, 1201, "Validating as a JSONL file.")
-			v.log(1201, nil)
+			v.log(2201, nil)
 			return v.readJSONLFile(u.Path)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			// logger.LogMessage(MessageIdFormat, 1202, "Validating a GZ file.")
-			v.log(1202, nil)
+			v.log(2203, nil)
 			return v.readGZFile(u.Path)
 		} else {
-			// logger.LogMessage(MessageIdFormat, 2003, "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--fileType).")
 			v.log(2003, nil)
 		}
 	} else if u.Scheme == "http" || u.Scheme == "https" {
-		fmt.Println("scheme:", u.Scheme)
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			// logger.LogMessage(MessageIdFormat, 1204, "Validating as a JSONL resource.")
-			v.log(1204, nil)
+			v.log(2204, nil)
 			return v.readJSONLResource(v.InputURL)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			// logger.LogMessage(MessageIdFormat, 1205, "Validating a GZ resource.")
-			v.log(1205, nil)
+			v.log(2205, nil)
 			return v.readGZResource(v.InputURL)
 		} else {
-			// logger.LogMessage(MessageIdFormat, 2004, "If this is a valid JSONL resource, please rename with the .jsonl extension or use the file type override (--file-type).")
 			v.log(2004, nil)
 		}
 	} else {
-		// logger.LogMessage(MessageIdFormat, 9002, fmt.Sprintf("We don't handle %s input URLs.", u.Scheme))
-		v.log(9002, u.Scheme)
+		v.log(4002, u.Scheme)
 	}
 	return false
 }
@@ -147,9 +136,7 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 	response, err := http.Get(jsonURL)
 
 	if err != nil {
-		fmt.Println("unable to get:", jsonURL)
-		// logger.LogMessageFromError(MessageIdFormat, 9003, "Fatal error retrieving inputURL.", err)
-		v.log(9003, jsonURL, err)
+		v.log(4003, jsonURL, err)
 		return false
 	}
 	defer response.Body.Close()
@@ -161,8 +148,7 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 	file, err := os.Open(jsonFile)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9004, "Fatal error opening inputURL.", err)
-		v.log(9004, jsonFile, err)
+		v.log(4004, jsonFile, err)
 		return false
 	}
 	defer file.Close()
@@ -174,8 +160,7 @@ func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 func (v *ValidateImpl) readStdin() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9005, "Fatal error opening stdin.", err)
-		v.log(9005, err)
+		v.log(4005, err)
 		return false
 	}
 	//printFileInfo(info)
@@ -186,8 +171,7 @@ func (v *ValidateImpl) readStdin() bool {
 		v.validateLines(reader)
 		return true
 	}
-	// logger.LogMessageFromError(MessageIdFormat, 9006, "Fatal error stdin not piped.", err)
-	v.log(9006, err)
+	v.log(4006, err)
 	return false
 }
 
@@ -195,15 +179,13 @@ func (v *ValidateImpl) readStdin() bool {
 func (v *ValidateImpl) readGZResource(gzURL string) bool {
 	response, err := http.Get(gzURL)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9009, "Fatal error retrieving inputURL.", err)
-		v.log(9009, gzURL, err)
+		v.log(4009, gzURL, err)
 		return false
 	}
 	defer response.Body.Close()
 	reader, err := gzip.NewReader(response.Body)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9010, "Fatal error reading inputURL.", err)
-		v.log(9010, gzURL, err)
+		v.log(4010, gzURL, err)
 		return false
 	}
 	defer reader.Close()
@@ -217,16 +199,14 @@ func (v *ValidateImpl) readGZResource(gzURL string) bool {
 func (v *ValidateImpl) readGZFile(gzFile string) bool {
 	gzipfile, err := os.Open(gzFile)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9007, "Fatal error opening inputURL.", err)
-		v.log(9007, gzFile, err)
+		v.log(4007, gzFile, err)
 		return false
 	}
 	defer gzipfile.Close()
 
 	reader, err := gzip.NewReader(gzipfile)
 	if err != nil {
-		// logger.LogMessageFromError(MessageIdFormat, 9008, "Fatal error reading inputURL.", err)
-		v.log(9008, gzFile, err)
+		v.log(4008, gzFile, err)
 		return false
 	}
 	defer reader.Close()
@@ -249,7 +229,7 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 		if len(str) > 0 {
 			valid, err := record.Validate(str)
 			if !valid {
-				fmt.Println("Line", totalLines, err)
+				// fmt.Println("Line", totalLines, err)
 				if err != nil {
 					if strings.Contains(err.Error(), "RECORD_ID") {
 						noRecordId++
@@ -265,23 +245,18 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 		}
 	}
 	if noRecordId > 0 {
-		// logger.LogMessage(MessageIdFormat, 1206, fmt.Sprintf("%d line(s) had no RECORD_ID field.", noRecordId))
-		v.log(1206, noRecordId)
+		v.log(2206, noRecordId)
 	}
 	if noDataSource > 0 {
-		// logger.LogMessage(MessageIdFormat, 1207, fmt.Sprintf("%d line(s) had no DATA_SOURCE field.", noDataSource))
-		v.log(1207, noDataSource)
+		v.log(2207, noDataSource)
 	}
 	if malformed > 0 {
-		// logger.LogMessage(MessageIdFormat, 1208, fmt.Sprintf("%d line(s) are not well formed JSON-lines.", malformed))
-		v.log(1208, malformed)
+		v.log(2208, malformed)
 	}
 	if badRecord > 0 {
-		// logger.LogMessage(MessageIdFormat, 1209, fmt.Sprintf("%d line(s) did not validate for an unknown reason.", badRecord))
-		v.log(1209, badRecord)
+		v.log(2209, badRecord)
 	}
-	// logger.LogMessage(MessageIdFormat, 1210, fmt.Sprintf("Validated %d lines, %d were bad.", totalLines, noRecordId+noDataSource+malformed+badRecord))
-	v.log(1210, totalLines, noRecordId+noDataSource+malformed+badRecord)
+	v.log(2210, totalLines, noRecordId+noDataSource+malformed+badRecord)
 }
 
 // ----------------------------------------------------------------------------
