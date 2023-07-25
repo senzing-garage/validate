@@ -20,11 +20,10 @@ import (
 // ----------------------------------------------------------------------------
 
 type ValidateImpl struct {
-	InputFileType     string
-	InputURL          string
-	logger            logging.LoggingInterface
-	SenzingLogLevel   string
-	SenzingModuleName string
+	InputFileType string
+	InputURL      string
+	logger        logging.LoggingInterface
+	LogLevel      string
 }
 
 // ----------------------------------------------------------------------------

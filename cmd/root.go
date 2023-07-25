@@ -4,13 +4,14 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/senzing/go-cmdhelping/cmdhelper"
 	"github.com/senzing/go-cmdhelping/option"
-	"github.com/senzing/validate/examplepackage"
+	"github.com/senzing/validate/validate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,6 +37,7 @@ validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/S
 var ContextVariables = []option.ContextVariable{
 	option.EngineModuleName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
 	option.LogLevel,
+	option.InputFileType,
 	option.InputURL,
 }
 
@@ -71,24 +73,15 @@ func RunE(_ *cobra.Command, _ []string) error {
 	var err error = nil
 	ctx := context.Background()
 
-	inputURL := viper.GetString(option.InputURL.Arg)
-	inputURLLen := len(inputURL)
-
-	// if inputURLLen == 0 {
-	// 	//assume stdin
-	// 	return readStdin()
-	// }
-
-	//This assumes the URL includes a schema and path so, minimally:
-	//  "s://p" where the schema is 's' and 'p' is the complete path
-	if inputURLLen < 5 {
-		// logger.LogMessage(MessageIdFormat, 2002, fmt.Sprintf("Check the inputURL parameter: %s", inputURL))
-		return fmt.Errorf("Check the inputURL parameter: [%s]", inputURL)
+	validator := &validate.ValidateImpl{
+		InputFileType: viper.GetString(option.InputFileType.Arg),
+		InputURL:      viper.GetString(option.InputURL.Arg),
+		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
-	examplePackage := &examplepackage.ExamplePackageImpl{
-		Something: "Main says 'Hi!'",
+
+	if !validator.Read(ctx) {
+		err = errors.New("Validation failed.")
 	}
-	err = examplePackage.SaySomething(ctx)
 	return err
 }
 
