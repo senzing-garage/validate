@@ -19,7 +19,7 @@ type Initializer interface {
 const ComponentId = 6203
 
 // Log message prefix.
-const Prefix = "validate."
+const Prefix = "validate: "
 
 // ----------------------------------------------------------------------------
 // Variables
