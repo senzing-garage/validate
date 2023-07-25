@@ -41,6 +41,17 @@ var traceOptions []interface{} = []interface{}{
 // ----------------------------------------------------------------------------
 func (v *ValidateImpl) Read(ctx context.Context) bool {
 
+	// Initialize logging.
+
+	logLevel := v.LogLevel
+	if logLevel == "" {
+		logLevel = "INFO"
+	}
+	err := v.SetLogLevel(ctx, logLevel)
+	if err != nil {
+		v.log(4001, logLevel, err)
+	}
+
 	inputURLLen := len(v.InputURL)
 
 	if inputURLLen == 0 {
@@ -58,7 +69,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	v.log(2200, v.InputURL)
 	u, err := url.Parse(v.InputURL)
 	if err != nil {
-		v.log(4001, err)
+		v.log(5001, err)
 		return false
 	}
 	if u.Scheme == "file" {
@@ -82,9 +93,31 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 			v.log(2004, nil)
 		}
 	} else {
-		v.log(4002, u.Scheme)
+		v.log(5002, u.Scheme)
 	}
 	return false
+}
+
+/*
+The SetLogLevel method sets the level of logging.
+
+Input
+  - ctx: A context to control lifecycle.
+  - logLevel: The desired log level. TRACE, DEBUG, INFO, WARN, ERROR, FATAL or PANIC.
+*/
+func (v *ValidateImpl) SetLogLevel(ctx context.Context, logLevelName string) error {
+	var err error = nil
+
+	// Verify value of logLevelName.
+
+	if !logging.IsValidLogLevelName(logLevelName) {
+		return fmt.Errorf("invalid error level: %s", logLevelName)
+	}
+
+	// Set ValidateImpl log level.
+
+	err = v.getLogger().SetLogLevel(logLevelName)
+	return err
 }
 
 // ----------------------------------------------------------------------------
@@ -136,7 +169,7 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 	response, err := http.Get(jsonURL)
 
 	if err != nil {
-		v.log(4003, jsonURL, err)
+		v.log(5003, jsonURL, err)
 		return false
 	}
 	defer response.Body.Close()
@@ -148,7 +181,7 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 	file, err := os.Open(jsonFile)
 	if err != nil {
-		v.log(4004, jsonFile, err)
+		v.log(5004, jsonFile, err)
 		return false
 	}
 	defer file.Close()
@@ -160,7 +193,7 @@ func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 func (v *ValidateImpl) readStdin() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		v.log(4005, err)
+		v.log(5005, err)
 		return false
 	}
 	//printFileInfo(info)
@@ -171,7 +204,7 @@ func (v *ValidateImpl) readStdin() bool {
 		v.validateLines(reader)
 		return true
 	}
-	v.log(4006, err)
+	v.log(5006, err)
 	return false
 }
 
@@ -179,13 +212,13 @@ func (v *ValidateImpl) readStdin() bool {
 func (v *ValidateImpl) readGZResource(gzURL string) bool {
 	response, err := http.Get(gzURL)
 	if err != nil {
-		v.log(4009, gzURL, err)
+		v.log(5009, gzURL, err)
 		return false
 	}
 	defer response.Body.Close()
 	reader, err := gzip.NewReader(response.Body)
 	if err != nil {
-		v.log(4010, gzURL, err)
+		v.log(5010, gzURL, err)
 		return false
 	}
 	defer reader.Close()
@@ -199,14 +232,14 @@ func (v *ValidateImpl) readGZResource(gzURL string) bool {
 func (v *ValidateImpl) readGZFile(gzFile string) bool {
 	gzipfile, err := os.Open(gzFile)
 	if err != nil {
-		v.log(4007, gzFile, err)
+		v.log(5007, gzFile, err)
 		return false
 	}
 	defer gzipfile.Close()
 
 	reader, err := gzip.NewReader(gzipfile)
 	if err != nil {
-		v.log(4008, gzFile, err)
+		v.log(5008, gzFile, err)
 		return false
 	}
 	defer reader.Close()
