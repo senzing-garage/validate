@@ -245,16 +245,16 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 		}
 	}
 	if noRecordId > 0 {
-		v.log(2206, noRecordId)
+		v.log(3001, noRecordId)
 	}
 	if noDataSource > 0 {
-		v.log(2207, noDataSource)
+		v.log(3002, noDataSource)
 	}
 	if malformed > 0 {
-		v.log(2208, malformed)
+		v.log(3003, malformed)
 	}
 	if badRecord > 0 {
-		v.log(2209, badRecord)
+		v.log(3004, badRecord)
 	}
 	v.log(2210, totalLines, noRecordId+noDataSource+malformed+badRecord)
 }
