@@ -13,8 +13,9 @@ import (
 )
 
 func TestRead(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	tmpfile := createTempDataFile(t, testGoodData)
 	defer os.Remove(tmpfile.Name()) // clean up
@@ -31,14 +32,14 @@ func TestRead(t *testing.T) {
 		got += "\n"
 	}
 
-	os.Stdout = origStdout
 	msg := "Validated 12 lines, 0 were bad"
 	assert.Contains(t, got, msg)
 }
 
 func TestRead_bad(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	tmpfile := createTempDataFile(t, testBadData)
 	defer os.Remove(tmpfile.Name()) // clean up
@@ -55,15 +56,14 @@ func TestRead_bad(t *testing.T) {
 		got += "\n"
 	}
 
-	os.Stdout = origStdout
-	// fmt.Println(got)
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
 }
 
 func TestReadJSONLFile(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	tmpfile := createTempDataFile(t, testGoodData)
 	defer os.Remove(tmpfile.Name()) // clean up
@@ -76,14 +76,14 @@ func TestReadJSONLFile(t *testing.T) {
 	scanner.Scan() // blocks until a new line is written to the pipe
 
 	got := scanner.Text() // the last line written to the scanner
-	os.Stdout = origStdout
 	msg := "Validated 12 lines, 0 were bad"
 	assert.Contains(t, got, msg)
 }
 
 func TestReadJSONLFile_bad(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	tmpfile := createTempDataFile(t, testBadData)
 	defer os.Remove(tmpfile.Name()) // clean up
@@ -100,14 +100,14 @@ func TestReadJSONLFile_bad(t *testing.T) {
 		got += "\n"
 	}
 
-	os.Stdout = origStdout
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
 }
 
 func TestValidateLines(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	validator := &ValidateImpl{}
 	validator.validateLines(strings.NewReader(testGoodData))
@@ -116,14 +116,14 @@ func TestValidateLines(t *testing.T) {
 
 	got := scanner.Text() // the last line written to the scanner
 
-	os.Stdout = origStdout
 	msg := "Validated 12 lines, 0 were bad"
 	assert.Contains(t, got, msg)
 }
 
 func TestValidateLines_bad(t *testing.T) {
-	origStdout := os.Stdout
-	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	validator := &ValidateImpl{}
 	validator.validateLines(strings.NewReader(testBadData))
@@ -135,7 +135,6 @@ func TestValidateLines_bad(t *testing.T) {
 		got += "\n"
 	}
 
-	os.Stdout = origStdout
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
 }
@@ -144,23 +143,12 @@ func TestValidateLines_bad(t *testing.T) {
 // Helper functions
 // ----------------------------------------------------------------------------
 
-func mockStdout(t *testing.T) *bufio.Scanner {
-	reader, writer, err := os.Pipe()
-	if err != nil {
-		assert.Fail(t, "couldn't get os Pipe: %v", err)
-	}
-	os.Stdout = writer
-
-	return bufio.NewScanner(reader)
-}
-
 func createTempDataFile(t *testing.T, content string) *os.File {
-	tmpfile, err := ioutil.TempFile("", "test.*.jsonl")
+	t.Helper()
+	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*.jsonl")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// defer os.Remove(tmpfile.Name()) // clean up
 
 	if _, err := tmpfile.WriteString(content); err != nil {
 		t.Fatal(err)
@@ -169,6 +157,40 @@ func createTempDataFile(t *testing.T, content string) *os.File {
 		t.Fatal(err)
 	}
 	return tmpfile
+}
+
+func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
+	t.Helper()
+	origStdout := os.Stdout
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		assert.Fail(t, "couldn't get os Pipe: %v", err)
+	}
+	os.Stdout = writer
+
+	return bufio.NewScanner(reader),
+		func() {
+			//clean-up
+			os.Stdout = origStdout
+		}
+}
+
+func mockStdin(t *testing.T, content string) (cleanUp func()) {
+	t.Helper()
+
+	origStdin := os.Stdin
+
+	tmpfile := createTempDataFile(t, content)
+	// ioutil.TempFile(t.TempDir(), t.Name())
+
+	// Set stdin to the temp file
+	os.Stdin = tmpfile
+
+	return func() {
+		// clean-up
+		os.Stdin = origStdin
+		os.Remove(tmpfile.Name())
+	}
 }
 
 var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
