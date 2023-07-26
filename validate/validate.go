@@ -262,15 +262,18 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 		if len(str) > 0 {
 			valid, err := record.Validate(str)
 			if !valid {
-				// fmt.Println("Line", totalLines, err)
 				if err != nil {
 					if strings.Contains(err.Error(), "RECORD_ID") {
+						v.log(3005, totalLines)
 						noRecordId++
 					} else if strings.Contains(err.Error(), "DATA_SOURCE") {
+						v.log(3006, totalLines)
 						noDataSource++
 					} else if strings.Contains(err.Error(), "not well formed") {
+						v.log(3007, totalLines)
 						malformed++
 					} else {
+						v.log(3008, totalLines)
 						badRecord++
 					}
 				}
