@@ -28,18 +28,11 @@ type ValidateImpl struct {
 }
 
 // ----------------------------------------------------------------------------
-// Variables
+// Public methods
 // ----------------------------------------------------------------------------
 
-var debugOptions []interface{} = []interface{}{
-	&logging.OptionCallerSkip{Value: 5},
-}
-
-var traceOptions []interface{} = []interface{}{
-	&logging.OptionCallerSkip{Value: 5},
-}
-
-// ----------------------------------------------------------------------------
+// using the information in the ValidateImpl object read and validate that
+// the records are valid
 func (v *ValidateImpl) Read(ctx context.Context) bool {
 
 	// Initialize logging.
@@ -125,51 +118,9 @@ func (v *ValidateImpl) SetLogLevel(ctx context.Context, logLevelName string) err
 // Internal methods
 // ----------------------------------------------------------------------------
 
-// --- Logging ----------------------------------------------------------------
-
-// Get the Logger singleton.
-func (v *ValidateImpl) getLogger() logging.LoggingInterface {
-	var err error = nil
-	if v.logger == nil {
-		options := []interface{}{
-			&logging.OptionCallerSkip{Value: 4},
-		}
-		v.logger, err = logging.NewSenzingToolsLogger(ComponentId, IdMessages, options...)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return v.logger
-}
-
-// Log message.
-func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
-	if v.JSONOutput {
-		v.getLogger().Log(messageNumber, details...)
-	} else {
-		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
-	}
-}
-
-// Debug.
-func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
-	details = append(details, debugOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
-
-// Trace method entry.
-func (v *ValidateImpl) traceEntry(messageNumber int, details ...interface{}) {
-	details = append(details, traceOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
-
-// Trace method exit.
-func (v *ValidateImpl) traceExit(messageNumber int, details ...interface{}) {
-	details = append(details, traceOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
-
 // ----------------------------------------------------------------------------
+
+// opens and reads a JSONL resource
 func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 	response, err := http.Get(jsonURL)
 
@@ -183,6 +134,8 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 }
 
 // ----------------------------------------------------------------------------
+
+// opens and reads a JSONL file
 func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 	file, err := os.Open(jsonFile)
 	if err != nil {
@@ -195,6 +148,8 @@ func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
 }
 
 // ----------------------------------------------------------------------------
+
+// opens and reads a JSONL that has been piped to stdin
 func (v *ValidateImpl) readStdin() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {
@@ -214,6 +169,8 @@ func (v *ValidateImpl) readStdin() bool {
 }
 
 // ----------------------------------------------------------------------------
+
+// opens and reads a JSONL resource that has been Gzipped
 func (v *ValidateImpl) readGZResource(gzURL string) bool {
 	response, err := http.Get(gzURL)
 	if err != nil {
@@ -253,6 +210,8 @@ func (v *ValidateImpl) readGZFile(gzFile string) bool {
 }
 
 // ----------------------------------------------------------------------------
+
+// validate that each line read from the reader is a valid record
 func (v *ValidateImpl) validateLines(reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 	totalLines := 0
@@ -301,20 +260,61 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 }
 
 // ----------------------------------------------------------------------------
-func (v *ValidateImpl) printFileInfo(info os.FileInfo) {
-	fmt.Println("name: ", info.Name())
-	fmt.Println("size: ", info.Size())
-	fmt.Println("mode: ", info.Mode())
-	fmt.Println("mod time: ", info.ModTime())
-	fmt.Println("is dir: ", info.IsDir())
-	if info.Mode()&os.ModeDevice == os.ModeDevice {
-		fmt.Println("detected device: ", os.ModeDevice)
+// Logging --------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// Variables
+// ----------------------------------------------------------------------------
+
+var debugOptions []interface{} = []interface{}{
+	&logging.OptionCallerSkip{Value: 5},
+}
+
+var traceOptions []interface{} = []interface{}{
+	&logging.OptionCallerSkip{Value: 5},
+}
+
+// ----------------------------------------------------------------------------
+// logger methods
+
+// Get the Logger singleton.
+func (v *ValidateImpl) getLogger() logging.LoggingInterface {
+	var err error = nil
+	if v.logger == nil {
+		options := []interface{}{
+			&logging.OptionCallerSkip{Value: 4},
+		}
+		v.logger, err = logging.NewSenzingToolsLogger(ComponentId, IdMessages, options...)
+		if err != nil {
+			panic(err)
+		}
 	}
-	if info.Mode()&os.ModeCharDevice == os.ModeCharDevice {
-		fmt.Println("detected char device: ", os.ModeCharDevice)
+	return v.logger
+}
+
+// Log message.
+func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
+	if v.JSONOutput {
+		v.getLogger().Log(messageNumber, details...)
+	} else {
+		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
 	}
-	if info.Mode()&os.ModeNamedPipe == os.ModeNamedPipe {
-		fmt.Println("detected named pipe: ", os.ModeNamedPipe)
-	}
-	fmt.Printf("\n\n")
+}
+
+// Debug.
+func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
+	details = append(details, debugOptions...)
+	v.getLogger().Log(messageNumber, details...)
+}
+
+// Trace method entry.
+func (v *ValidateImpl) traceEntry(messageNumber int, details ...interface{}) {
+	details = append(details, traceOptions...)
+	v.getLogger().Log(messageNumber, details...)
+}
+
+// Trace method exit.
+func (v *ValidateImpl) traceExit(messageNumber int, details ...interface{}) {
+	details = append(details, traceOptions...)
+	v.getLogger().Log(messageNumber, details...)
 }
