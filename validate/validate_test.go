@@ -17,8 +17,8 @@ func TestRead(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile := createTempDataFile(t, testGoodData)
-	defer os.Remove(tmpfile.Name()) // clean up
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData)
+	defer moreCleanUp()
 
 	validator := &ValidateImpl{
 		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
@@ -41,8 +41,8 @@ func TestRead_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile := createTempDataFile(t, testBadData)
-	defer os.Remove(tmpfile.Name()) // clean up
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData)
+	defer moreCleanUp()
 
 	validator := &ValidateImpl{
 		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
@@ -60,13 +60,13 @@ func TestRead_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestReadJSONLFile(t *testing.T) {
+func TestReadJsonlFile(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile := createTempDataFile(t, testGoodData)
-	defer os.Remove(tmpfile.Name()) // clean up
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData)
+	defer moreCleanUp()
 
 	validator := &ValidateImpl{
 		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
@@ -80,13 +80,13 @@ func TestReadJSONLFile(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestReadJSONLFile_bad(t *testing.T) {
+func TestReadJsonlFile_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile := createTempDataFile(t, testBadData)
-	defer os.Remove(tmpfile.Name()) // clean up
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData)
+	defer moreCleanUp()
 
 	validator := &ValidateImpl{
 		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
@@ -143,7 +143,7 @@ func TestValidateLines_bad(t *testing.T) {
 // Helper functions
 // ----------------------------------------------------------------------------
 
-func createTempDataFile(t *testing.T, content string) *os.File {
+func createTempDataFile(t *testing.T, content string) (tmpfile *os.File, cleanUp func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*.jsonl")
 	if err != nil {
@@ -153,10 +153,14 @@ func createTempDataFile(t *testing.T, content string) *os.File {
 	if _, err := tmpfile.WriteString(content); err != nil {
 		t.Fatal(err)
 	}
-	if err := tmpfile.Close(); err != nil {
-		t.Fatal(err)
-	}
-	return tmpfile
+
+	return tmpfile,
+		func() {
+			if err := tmpfile.Close(); err != nil {
+				t.Fatal(err)
+			}
+			os.Remove(tmpfile.Name())
+		}
 }
 
 func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
@@ -173,24 +177,6 @@ func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
 			//clean-up
 			os.Stdout = origStdout
 		}
-}
-
-func mockStdin(t *testing.T, content string) (cleanUp func()) {
-	t.Helper()
-
-	origStdin := os.Stdin
-
-	tmpfile := createTempDataFile(t, content)
-	// ioutil.TempFile(t.TempDir(), t.Name())
-
-	// Set stdin to the temp file
-	os.Stdin = tmpfile
-
-	return func() {
-		// clean-up
-		os.Stdin = origStdin
-		os.Remove(tmpfile.Name())
-	}
 }
 
 var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
