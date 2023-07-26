@@ -2,6 +2,9 @@ package validate
 
 import (
 	"bufio"
+	"context"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -10,7 +13,96 @@ import (
 )
 
 func TestRead(t *testing.T) {
+	origStdout := os.Stdout
+	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
 
+	tmpfile := createTempDataFile(t, testGoodData)
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	validator := &ValidateImpl{
+		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	os.Stdout = origStdout
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+}
+
+func TestRead_bad(t *testing.T) {
+	origStdout := os.Stdout
+	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	tmpfile := createTempDataFile(t, testBadData)
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	validator := &ValidateImpl{
+		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 10; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	os.Stdout = origStdout
+	// fmt.Println(got)
+	msg := "Validated 16 lines, 4 were bad"
+	assert.Contains(t, got, msg)
+}
+
+func TestReadJSONLFile(t *testing.T) {
+	origStdout := os.Stdout
+	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	tmpfile := createTempDataFile(t, testGoodData)
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	validator := &ValidateImpl{
+		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.readJSONLFile(tmpfile.Name())
+
+	scanner.Scan() // blocks until a new line is written to the pipe
+
+	got := scanner.Text() // the last line written to the scanner
+	os.Stdout = origStdout
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+}
+
+func TestReadJSONLFile_bad(t *testing.T) {
+	origStdout := os.Stdout
+	scanner := mockStdout(t) // turn this off when debugging or developing as you will miss output!
+
+	tmpfile := createTempDataFile(t, testBadData)
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	validator := &ValidateImpl{
+		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.readJSONLFile(tmpfile.Name())
+
+	var got string = ""
+	for i := 0; i < 8; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	os.Stdout = origStdout
+	msg := "Validated 16 lines, 4 were bad"
+	assert.Contains(t, got, msg)
 }
 
 func TestValidateLines(t *testing.T) {
@@ -60,6 +152,23 @@ func mockStdout(t *testing.T) *bufio.Scanner {
 	os.Stdout = writer
 
 	return bufio.NewScanner(reader)
+}
+
+func createTempDataFile(t *testing.T, content string) *os.File {
+	tmpfile, err := ioutil.TempFile("", "test.*.jsonl")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// defer os.Remove(tmpfile.Name()) // clean up
+
+	if _, err := tmpfile.WriteString(content); err != nil {
+		t.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		t.Fatal(err)
+	}
+	return tmpfile
 }
 
 var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
