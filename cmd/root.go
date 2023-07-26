@@ -36,9 +36,10 @@ validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/S
 
 var ContextVariables = []option.ContextVariable{
 	option.EngineModuleName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
-	option.LogLevel,
 	option.InputFileType,
 	option.InputURL,
+	option.JSONOutput,
+	option.LogLevel,
 }
 
 // ----------------------------------------------------------------------------
@@ -76,6 +77,7 @@ func RunE(_ *cobra.Command, _ []string) error {
 	validator := &validate.ValidateImpl{
 		InputFileType: viper.GetString(option.InputFileType.Arg),
 		InputURL:      viper.GetString(option.InputURL.Arg),
+		JSONOutput:    viper.GetBool(option.JSONOutput.Arg),
 		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
 

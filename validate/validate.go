@@ -22,6 +22,7 @@ import (
 type ValidateImpl struct {
 	InputFileType string
 	InputURL      string
+	JSONOutput    bool
 	logger        logging.LoggingInterface
 	LogLevel      string
 }
@@ -74,23 +75,23 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	}
 	if u.Scheme == "file" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			v.log(2201, nil)
+			v.log(2201)
 			return v.readJSONLFile(u.Path)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			v.log(2203, nil)
+			v.log(2203)
 			return v.readGZFile(u.Path)
 		} else {
-			v.log(2003, nil)
+			v.log(2003)
 		}
 	} else if u.Scheme == "http" || u.Scheme == "https" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			v.log(2204, nil)
+			v.log(2204)
 			return v.readJSONLResource(v.InputURL)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			v.log(2205, nil)
+			v.log(2205)
 			return v.readGZResource(v.InputURL)
 		} else {
-			v.log(2004, nil)
+			v.log(2004)
 		}
 	} else {
 		v.log(5002, u.Scheme)
@@ -143,7 +144,11 @@ func (v *ValidateImpl) getLogger() logging.LoggingInterface {
 
 // Log message.
 func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
-	v.getLogger().Log(messageNumber, details...)
+	if v.JSONOutput {
+		v.getLogger().Log(messageNumber, details...)
+	} else {
+		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
+	}
 }
 
 // Debug.
