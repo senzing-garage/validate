@@ -50,7 +50,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	}
 	err := v.SetLogLevel(ctx, logLevel)
 	if err != nil {
-		v.log(4001, logLevel, err)
+		v.log(3009, logLevel, err)
 	}
 
 	inputURLLen := len(v.InputURL)
@@ -63,7 +63,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	//This assumes the URL includes a schema and path so, minimally:
 	//  "s://p" where the schema is 's' and 'p' is the complete path
 	if inputURLLen < 5 {
-		v.log(4002, v.InputURL)
+		v.log(5000, v.InputURL)
 		return false
 	}
 
@@ -81,7 +81,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 			v.log(2203)
 			return v.readGZFile(u.Path)
 		} else {
-			v.log(2003)
+			v.log(5011)
 		}
 	} else if u.Scheme == "http" || u.Scheme == "https" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
@@ -91,7 +91,7 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 			v.log(2205)
 			return v.readGZResource(v.InputURL)
 		} else {
-			v.log(2004)
+			v.log(5012)
 		}
 	} else {
 		v.log(5002, u.Scheme)

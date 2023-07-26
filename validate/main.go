@@ -27,8 +27,6 @@ const Prefix = "validate: "
 
 // Message templates for g2config implementations.
 var IdMessages = map[int]string{
-	2003: Prefix + "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type).",
-	2004: Prefix + "If this is a valid JSONL resource, please rename with the .jsonl extension or use the file type override (--file-type).",
 	2200: Prefix + "Validating URL string: %s",
 	2201: Prefix + "Validating as a JSONL file.",
 	2203: Prefix + "Validating a GZ file.",
@@ -43,8 +41,8 @@ var IdMessages = map[int]string{
 	3006: Prefix + "Line %d: a DATA_SOURCE field is required",
 	3007: Prefix + "Line %d: JSON-line not well formed",
 	3008: Prefix + "Line %d: did not validate for an unknown reason",
-	4001: Prefix + "Error: Unable to set log level to: %s",
-	4002: Prefix + "Error: Check the input-url parameter: %s",
+	3009: Prefix + "Warning: Unable to set log level to %s, defaulting to INFO",
+	5000: Prefix + "Fatal error, Check the input-url parameter: %s",
 	5001: Prefix + "Fatal error parsing input-url.",
 	5002: Prefix + "Fatal error unable to handle %s input URLs.",
 	5003: Prefix + "Fatal error retrieving input-url: %s",
@@ -55,6 +53,8 @@ var IdMessages = map[int]string{
 	5008: Prefix + "Fatal error reading gzipped file: %s",
 	5009: Prefix + "Fatal error retrieving gzipped input-url: %s",
 	5010: Prefix + "Fatal error reading gzipped input-url: %s",
+	5011: Prefix + "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type).",
+	5012: Prefix + "If this is a valid JSONL resource, please rename with the .jsonl extension or use the file type override (--file-type).",
 
 	// 10:  "Enter " + Prefix + "Initialize().",
 	// 11:  "Exit  " + Prefix + "Initialize(); json.Marshal failed; returned (%v).",
