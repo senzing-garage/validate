@@ -17,7 +17,7 @@ func TestRead(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData)
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
@@ -41,7 +41,7 @@ func TestRead_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData)
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
@@ -65,7 +65,7 @@ func TestReadJsonlFile(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData)
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
@@ -85,7 +85,7 @@ func TestReadJsonlFile_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData)
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
@@ -143,9 +143,9 @@ func TestValidateLines_bad(t *testing.T) {
 // Helper functions
 // ----------------------------------------------------------------------------
 
-func createTempDataFile(t *testing.T, content string) (tmpfile *os.File, cleanUp func()) {
+func createTempDataFile(t *testing.T, content string, fileextension string) (tmpfile *os.File, cleanUp func()) {
 	t.Helper()
-	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*.jsonl")
+	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
 	if err != nil {
 		t.Fatal(err)
 	}
