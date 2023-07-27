@@ -209,27 +209,36 @@ func TestReadJsonlFile_jsonOutput_bad(t *testing.T) {
 // ----------------------------------------------------------------------------
 // test gzip file read
 
-// func TestReadGzipFile(t *testing.T) {
-// 	origStdout := os.Stdout
-// 	scanner, cleanUp := mockStdout(t)
-// 	defer cleanUp()
+func TestReadGzipFile(t *testing.T) {
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+	tmpfile, err := ioutil.TempFile("", "test.*.jsonl.gz")
+	// tmpfile, err := os.OpenFile("/tmp/q.gz", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gf := gzip.NewWriter(tmpfile)
+	fw := bufio.NewWriter(gf)
+	fw.WriteString(testGoodData)
+	fw.Flush()
+	gf.Close()
+	tmpfile.Close()
+	defer os.Remove(tmpfile.Name())
+	// createTempGzDataFile(t, testGoodData)
+	// tmpfile, _ := createTempGzDataFile(t, testGoodData)
+	// defer moreCleanUp()
 
-// 	tmpfile, _ := createTempDataFile(t, testGoodData, "gz")
-// 	// defer moreCleanUp()
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.readGZFile(tmpfile.Name())
 
-// 	validator := &ValidateImpl{
-// 		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
-// 	}
-// 	validator.readGZFile(tmpfile.Name())
+	scanner.Scan() // blocks until a new line is written to the pipe
 
-// 	scanner.Scan() // blocks until a new line is written to the pipe
-
-// 	got := scanner.Text() // the last line written to the scanner
-// 	os.Stdout = origStdout
-// 	fmt.Println(got)
-// 	// msg := "Validated 12 lines, 0 were bad"
-// 	// assert.Contains(t, got, msg)
-// }
+	got := scanner.Text() // the last line written to the scanner
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+}
 
 // func TestReadJsonlFile_bad(t *testing.T) {
 
@@ -386,25 +395,6 @@ func createTempDataFile(t *testing.T, content string, fileextension string) (tmp
 		t.Fatal(err)
 	}
 
-	// when testing gzipped files
-	if fileextension == "gz" {
-		writer := gzip.NewWriter(tmpfile)
-		fmt.Println(content)
-		if _, err := writer.Write([]byte(content)); err != nil {
-			t.Fatal(err)
-		}
-		return tmpfile,
-			func() {
-				if err := writer.Close(); err != nil {
-					t.Fatal(err)
-				}
-				if err := tmpfile.Close(); err != nil {
-					t.Fatal(err)
-				}
-				os.Remove(tmpfile.Name())
-			}
-	}
-
 	if _, err := tmpfile.WriteString(content); err != nil {
 		t.Fatal(err)
 	}
@@ -420,26 +410,41 @@ func createTempDataFile(t *testing.T, content string, fileextension string) (tmp
 
 func createTempGzDataFile(t *testing.T, content string) (tmpfile *os.File, cleanUp func()) {
 	t.Helper()
-	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*.jsonl.gz")
+
+	// tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*.jsonl.gz")
+	tmpfile, err := os.OpenFile("/tmp/q.gz", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
 	if err != nil {
 		t.Fatal(err)
 	}
+	gf := gzip.NewWriter(tmpfile)
+	fw := bufio.NewWriter(gf)
+	fw.WriteString(testGoodData)
+	fw.Flush()
+	gf.Close()
+	tmpfile.Close()
 
-	// when testing gzipped files
-	writer := gzip.NewWriter(tmpfile)
-	fmt.Println(content)
-	if _, err := writer.Write([]byte(content)); err != nil {
-		t.Fatal(err)
-	}
+	// gzipWriter := gzip.NewWriter(tmpfile)
+	// writer := bufio.NewWriter(gzipWriter)
+	// writer := bufio.NewWriter(tmpfile)
+	// i, err := writer.WriteString(content)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// writer.Flush()
+	// fmt.Println("bytes written:", i)
+	// if err := gzipWriter.Close(); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := tmpfile.Close(); err != nil {
+	// 	t.Fatal(err)
+	// }
 	return tmpfile,
 		func() {
-			if err := writer.Close(); err != nil {
-				t.Fatal(err)
-			}
+
 			if err := tmpfile.Close(); err != nil {
 				t.Fatal(err)
 			}
-			os.Remove(tmpfile.Name())
+			// os.Remove(tmpfile.Name())
 		}
 }
 
