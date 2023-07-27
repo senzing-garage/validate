@@ -21,7 +21,7 @@ func TestRead(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
 	}
 	validator.Read(context.Background())
 
@@ -45,7 +45,7 @@ func TestRead_bad(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
 	}
 	validator.Read(context.Background())
 
@@ -60,6 +60,53 @@ func TestRead_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
+func TestRead_json(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+}
+
+func TestRead_json_bad(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+	}
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 10; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 16 lines, 4 were bad"
+	assert.Contains(t, got, msg)
+}
 func TestReadJsonlFile(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -69,7 +116,7 @@ func TestReadJsonlFile(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
 	}
 	validator.readJSONLFile(tmpfile.Name())
 
@@ -89,7 +136,7 @@ func TestReadJsonlFile_bad(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputURL: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
 	}
 	validator.readJSONLFile(tmpfile.Name())
 

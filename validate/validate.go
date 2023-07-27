@@ -21,8 +21,8 @@ import (
 
 type ValidateImpl struct {
 	InputFileType string
-	InputURL      string
-	JSONOutput    bool
+	InputUrl      string
+	JsonOutput    bool
 	logger        logging.LoggingInterface
 	LogLevel      string
 }
@@ -46,22 +46,22 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 		v.log(3009, logLevel, err)
 	}
 
-	inputURLLen := len(v.InputURL)
+	InputUrlLen := len(v.InputUrl)
 
-	if inputURLLen == 0 {
+	if InputUrlLen == 0 {
 		//assume stdin
 		return v.readStdin()
 	}
 
 	//This assumes the URL includes a schema and path so, minimally:
 	//  "s://p" where the schema is 's' and 'p' is the complete path
-	if inputURLLen < 5 {
-		v.log(5000, v.InputURL)
+	if InputUrlLen < 5 {
+		v.log(5000, v.InputUrl)
 		return false
 	}
 
-	v.log(2200, v.InputURL)
-	u, err := url.Parse(v.InputURL)
+	v.log(2200, v.InputUrl)
+	u, err := url.Parse(v.InputUrl)
 	if err != nil {
 		v.log(5001, err)
 		return false
@@ -79,10 +79,10 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 	} else if u.Scheme == "http" || u.Scheme == "https" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
 			v.log(2204)
-			return v.readJSONLResource(v.InputURL)
+			return v.readJSONLResource(v.InputUrl)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
 			v.log(2205)
-			return v.readGZResource(v.InputURL)
+			return v.readGZResource(v.InputUrl)
 		} else {
 			v.log(5012)
 		}
