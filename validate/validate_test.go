@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// ----------------------------------------------------------------------------
+// test Read method
 func TestRead(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -60,16 +62,17 @@ func TestRead_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestRead_json(t *testing.T) {
+func TestRead_jsonOutput(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		JsonOutput: true,
 	}
 	validator.Read(context.Background())
 
@@ -84,16 +87,17 @@ func TestRead_json(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestRead_json_bad(t *testing.T) {
+func TestRead_jsonOutput_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		JsonOutput: true,
 	}
 	validator.Read(context.Background())
 
@@ -107,6 +111,10 @@ func TestRead_json_bad(t *testing.T) {
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
 }
+
+// ----------------------------------------------------------------------------
+// test jsonl file read
+
 func TestReadJsonlFile(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -151,6 +159,54 @@ func TestReadJsonlFile_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
+func TestReadJsonlFile_jsonOutput(t *testing.T) {
+
+	scanner, cleanUp := mockStderr(t)
+	defer cleanUp()
+
+	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		JsonOutput: true,
+	}
+	validator.readJSONLFile(tmpfile.Name())
+
+	scanner.Scan() // blocks until a new line is written to the pipe
+
+	got := scanner.Text() // the last line written to the scanner
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+}
+
+func TestReadJsonlFile_jsonOutput_bad(t *testing.T) {
+
+	scanner, cleanUp := mockStderr(t)
+	defer cleanUp()
+
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		JsonOutput: true,
+	}
+	validator.readJSONLFile(tmpfile.Name())
+
+	var got string = ""
+	for i := 0; i < 8; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 16 lines, 4 were bad"
+	assert.Contains(t, got, msg)
+}
+
+// ----------------------------------------------------------------------------
+// test validateLines
 func TestValidateLines(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -223,6 +279,22 @@ func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
 		func() {
 			//clean-up
 			os.Stdout = origStdout
+		}
+}
+
+func mockStderr(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
+	t.Helper()
+	origStderr := os.Stderr
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		assert.Fail(t, "couldn't get os Pipe: %v", err)
+	}
+	os.Stderr = writer
+
+	return bufio.NewScanner(reader),
+		func() {
+			//clean-up
+			os.Stderr = origStderr
 		}
 }
 

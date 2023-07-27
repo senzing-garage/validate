@@ -294,7 +294,7 @@ func (v *ValidateImpl) getLogger() logging.LoggingInterface {
 
 // Log message.
 func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
-	if v.JSONOutput {
+	if v.JsonOutput {
 		v.getLogger().Log(messageNumber, details...)
 	} else {
 		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
