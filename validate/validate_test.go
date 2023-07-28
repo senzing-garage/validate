@@ -15,6 +15,7 @@ import (
 
 // ----------------------------------------------------------------------------
 // test Read method
+// ----------------------------------------------------------------------------
 
 // read jsonl file successfully, no record validation errors
 func TestRead(t *testing.T) {
@@ -188,6 +189,43 @@ func TestRead_file_doesnt_exist(t *testing.T) {
 	assert.False(t, result)
 }
 
+func TestRead_stdin_unpipe_error(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	origStdin := os.Stdin
+	defer func() { os.Stdin = origStdin }()
+
+	file, err := os.Open(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdin = file
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	validator := &ValidateImpl{}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 1; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error stdin not piped"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+}
+
 // attempt to read a file, but it has a file type that is not known
 func TestRead_bad_file_type(t *testing.T) {
 
@@ -243,7 +281,9 @@ func TestRead_override_file_type(t *testing.T) {
 
 // ----------------------------------------------------------------------------
 // test Read with .gz files
+// ----------------------------------------------------------------------------
 
+// read a gz file successfully, with no record validation errors
 func TestRead_gz(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -269,6 +309,7 @@ func TestRead_gz(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a gz file successfully, but with record validation errors
 func TestRead_gz_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -296,7 +337,9 @@ func TestRead_gz_bad(t *testing.T) {
 
 // ----------------------------------------------------------------------------
 // test Read with Json output
+// ----------------------------------------------------------------------------
 
+// read a json file successfully, with no record validation errors
 func TestRead_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
@@ -323,6 +366,7 @@ func TestRead_jsonOutput(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a json file successfully, but with record validation errors
 func TestRead_jsonOutput_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
@@ -350,8 +394,10 @@ func TestRead_jsonOutput_bad(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
-// test jsonl file read
+// test jsonl file read with json output
+// ----------------------------------------------------------------------------
 
+// read a json file successfully, with no record validation errors
 func TestReadJsonlFile(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -373,6 +419,7 @@ func TestReadJsonlFile(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a json file successfully, but with record validation errors
 func TestReadJsonlFile_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -398,6 +445,7 @@ func TestReadJsonlFile_bad(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a json file successfully, with no record validation errors
 func TestReadJsonlFile_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
@@ -420,6 +468,7 @@ func TestReadJsonlFile_jsonOutput(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a json file successfully, but with record validation errors
 func TestReadJsonlFile_jsonOutput_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
@@ -448,7 +497,9 @@ func TestReadJsonlFile_jsonOutput_bad(t *testing.T) {
 
 // ----------------------------------------------------------------------------
 // test gzip file read
+// ----------------------------------------------------------------------------
 
+// read a gzip file successfully, no record validation errors
 func TestReadGzipFile(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -470,6 +521,7 @@ func TestReadGzipFile(t *testing.T) {
 	assert.True(t, result)
 }
 
+// read a gzip file successfully, but with record validation errors
 func TestReadGzipFile_bad(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -495,6 +547,7 @@ func TestReadGzipFile_bad(t *testing.T) {
 	assert.True(t, result)
 }
 
+// attempt to read a gzip file that doesn't exist
 func TestReadGzipFile_file_does_not_exist(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -515,6 +568,7 @@ func TestReadGzipFile_file_does_not_exist(t *testing.T) {
 	assert.False(t, result)
 }
 
+// attempt to read a gzip file that isn't a gzip file
 func TestReadGzipFile_not_a_gzip_file(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -537,8 +591,90 @@ func TestReadGzipFile_not_a_gzip_file(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
-// test validateLines
+// test read stdin
+// ----------------------------------------------------------------------------
 
+func TestReadStdin(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	origStdin := os.Stdin
+	defer func() { os.Stdin = origStdin }()
+
+	file, err := os.Open(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	os.Stdin = file
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	validator := &ValidateImpl{}
+	result := validator.readStdin()
+
+	var got string = ""
+	for i := 0; i < 1; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error stdin not piped"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+}
+func TestReadStdin_unpipe_error(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	origStdin := os.Stdin
+	defer func() { os.Stdin = origStdin }()
+
+	file, err := os.Open(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdin = file
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	validator := &ValidateImpl{}
+	result := validator.readStdin()
+
+	var got string = ""
+	for i := 0; i < 1; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error stdin not piped"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+}
+
+// ----------------------------------------------------------------------------
+// test validateLines
+// ----------------------------------------------------------------------------
+
+// validate lines with no record validation errors
 func TestValidateLines(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
@@ -554,7 +690,8 @@ func TestValidateLines(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestValidateLines_bad(t *testing.T) {
+// validate lines, but with record validation errors
+func TestValidateLines_with_validation_errors(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
@@ -573,6 +710,7 @@ func TestValidateLines_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
+// validate lines with no record validation errors, json output
 func TestValidateLines_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
@@ -590,7 +728,8 @@ func TestValidateLines_jsonOutput(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
-func TestValidateLines_jsonOutput_bad(t *testing.T) {
+// validate lines, but with record validation errors and json output
+func TestValidateLines_with_validation_errors_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()

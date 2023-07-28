@@ -156,7 +156,6 @@ func (v *ValidateImpl) readStdin() bool {
 		v.log(5005, err)
 		return false
 	}
-	//printFileInfo(info)
 
 	if info.Mode()&os.ModeNamedPipe == os.ModeNamedPipe {
 
