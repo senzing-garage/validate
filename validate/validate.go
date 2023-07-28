@@ -301,20 +301,20 @@ func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
 	}
 }
 
-// Debug.
-func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
-	details = append(details, debugOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
+// // Debug.
+// func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
+// 	details = append(details, debugOptions...)
+// 	v.getLogger().Log(messageNumber, details...)
+// }
 
-// Trace method entry.
-func (v *ValidateImpl) traceEntry(messageNumber int, details ...interface{}) {
-	details = append(details, traceOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
+// // Trace method entry.
+// func (v *ValidateImpl) traceEntry(messageNumber int, details ...interface{}) {
+// 	details = append(details, traceOptions...)
+// 	v.getLogger().Log(messageNumber, details...)
+// }
 
-// Trace method exit.
-func (v *ValidateImpl) traceExit(messageNumber int, details ...interface{}) {
-	details = append(details, traceOptions...)
-	v.getLogger().Log(messageNumber, details...)
-}
+// // Trace method exit.
+// func (v *ValidateImpl) traceExit(messageNumber int, details ...interface{}) {
+// 	details = append(details, traceOptions...)
+// 	v.getLogger().Log(messageNumber, details...)
+// }

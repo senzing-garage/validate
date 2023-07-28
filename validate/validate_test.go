@@ -63,6 +63,76 @@ func TestRead_bad(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
+func TestRead_bad_loglevel(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		LogLevel: "BAD",
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 10; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Unable to set log level to BAD"
+	assert.Contains(t, got, msg)
+	assert.Equal(t, true, result)
+}
+
+func TestRead_bad_url(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: "BAD",
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 1; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error, Check the input-url parameter: BAD"
+	assert.Contains(t, got, msg)
+	assert.Equal(t, false, result)
+}
+
+func TestRead_bad_drop_through(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: "BAD,Really bad",
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 2; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error unable to handle"
+	assert.Contains(t, got, msg)
+	assert.Equal(t, false, result)
+}
+
 func TestRead_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
