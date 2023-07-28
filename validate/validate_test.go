@@ -20,11 +20,11 @@ func TestRead(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", filename),
 	}
 	validator.Read(context.Background())
 
@@ -44,11 +44,11 @@ func TestRead_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", filename),
 	}
 	validator.Read(context.Background())
 
@@ -68,11 +68,11 @@ func TestRead_bad_loglevel(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", filename),
 		LogLevel: "BAD",
 	}
 	result := validator.Read(context.Background())
@@ -176,16 +176,41 @@ func TestRead_bad_file_doesnt_exist(t *testing.T) {
 	assert.Contains(t, got, msg)
 }
 
+func TestRead_bad_file_type(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
+	defer moreCleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("file://%s", filename),
+	}
+
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 2; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type)"
+	assert.Contains(t, got, msg)
+}
+
 func TestRead_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	validator.Read(context.Background())
@@ -206,11 +231,11 @@ func TestRead_jsonOutput_bad(t *testing.T) {
 	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	validator.Read(context.Background())
@@ -234,13 +259,13 @@ func TestReadJsonlFile(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", filename),
 	}
-	validator.readJSONLFile(tmpfile.Name())
+	validator.readJSONLFile(filename)
 
 	scanner.Scan() // blocks until a new line is written to the pipe
 
@@ -254,13 +279,13 @@ func TestReadJsonlFile_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl: fmt.Sprintf("file://%s", filename),
 	}
-	validator.readJSONLFile(tmpfile.Name())
+	validator.readJSONLFile(filename)
 
 	var got string = ""
 	for i := 0; i < 8; i++ {
@@ -278,14 +303,14 @@ func TestReadJsonlFile_jsonOutput(t *testing.T) {
 	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
-	validator.readJSONLFile(tmpfile.Name())
+	validator.readJSONLFile(filename)
 
 	scanner.Scan() // blocks until a new line is written to the pipe
 
@@ -299,14 +324,14 @@ func TestReadJsonlFile_jsonOutput_bad(t *testing.T) {
 	scanner, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+		InputUrl:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
-	validator.readJSONLFile(tmpfile.Name())
+	validator.readJSONLFile(filename)
 
 	var got string = ""
 	for i := 0; i < 8; i++ {
@@ -358,13 +383,13 @@ func TestReadGzipFile(t *testing.T) {
 // 	scanner, cleanUp := mockStdout(t)
 // 	defer cleanUp()
 
-// 	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+// 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 // 	defer moreCleanUp()
 
 // 	validator := &ValidateImpl{
-// 		InputUrl: fmt.Sprintf("file://%s", tmpfile.Name()),
+// 		InputUrl: fmt.Sprintf("file://%s", filename),
 // 	}
-// 	validator.readJSONLFile(tmpfile.Name())
+// 	validator.readJSONLFile(filename)
 
 // 	var got string = ""
 // 	for i := 0; i < 8; i++ {
@@ -386,10 +411,10 @@ func TestReadGzipFile(t *testing.T) {
 // 	defer moreCleanUp()
 
 // 	validator := &ValidateImpl{
-// 		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+// 		InputUrl:   fmt.Sprintf("file://%s", filename),
 // 		JsonOutput: true,
 // 	}
-// 	validator.readJSONLFile(tmpfile.Name())
+// 	validator.readJSONLFile(filename)
 
 // 	scanner.Scan() // blocks until a new line is written to the pipe
 
@@ -403,14 +428,14 @@ func TestReadGzipFile(t *testing.T) {
 // 	scanner, cleanUp := mockStderr(t)
 // 	defer cleanUp()
 
-// 	tmpfile, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+// 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 // 	defer moreCleanUp()
 
 // 	validator := &ValidateImpl{
-// 		InputUrl:   fmt.Sprintf("file://%s", tmpfile.Name()),
+// 		InputUrl:   fmt.Sprintf("file://%s", filename),
 // 		JsonOutput: true,
 // 	}
-// 	validator.readJSONLFile(tmpfile.Name())
+// 	validator.readJSONLFile(filename)
 
 // 	var got string = ""
 // 	for i := 0; i < 8; i++ {
@@ -501,7 +526,29 @@ func TestValidateLines_jsonOutput_bad(t *testing.T) {
 // Helper functions
 // ----------------------------------------------------------------------------
 
-func createTempDataFile(t *testing.T, content string, fileextension string) (tmpfile *os.File, cleanUp func()) {
+func createTempDataFile(t *testing.T, content string, fileextension string) (filename string, cleanUp func()) {
+	t.Helper()
+	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := tmpfile.WriteString(content); err != nil {
+		t.Fatal(err)
+	}
+
+	filename = tmpfile.Name()
+
+	if err := tmpfile.Close(); err != nil {
+		t.Fatal(err)
+	}
+	return filename,
+		func() {
+			os.Remove(filename)
+		}
+}
+
+func createTempDataFile_old(t *testing.T, content string, fileextension string) (tmpfile *os.File, cleanUp func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
 	if err != nil {
