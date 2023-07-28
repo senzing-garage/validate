@@ -111,6 +111,28 @@ func TestRead_bad_url(t *testing.T) {
 	assert.Equal(t, false, result)
 }
 
+func TestRead_bad_url_parse(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: "http://bad:bad{BAD=bad@example.com",
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 2; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error parsing input-url"
+	assert.Contains(t, got, msg)
+	assert.Equal(t, false, result)
+}
+
 func TestRead_bad_drop_through(t *testing.T) {
 
 	scanner, cleanUp := mockStdout(t)
