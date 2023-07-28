@@ -155,6 +155,27 @@ func TestRead_bad_drop_through(t *testing.T) {
 	assert.Equal(t, false, result)
 }
 
+func TestRead_bad_file_doesnt_exist(t *testing.T) {
+
+	scanner, cleanUp := mockStdout(t)
+	defer cleanUp()
+
+	validator := &ValidateImpl{
+		InputUrl: "file:///badfile.jsonl",
+	}
+	validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error opening input file: /badfile.jsonl"
+	assert.Contains(t, got, msg)
+}
+
 func TestRead_jsonOutput(t *testing.T) {
 
 	scanner, cleanUp := mockStderr(t)
