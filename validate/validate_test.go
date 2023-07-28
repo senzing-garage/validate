@@ -526,6 +526,7 @@ func TestValidateLines_jsonOutput_bad(t *testing.T) {
 // Helper functions
 // ----------------------------------------------------------------------------
 
+// create a tempdata baile with the given content and extension
 func createTempDataFile(t *testing.T, content string, fileextension string) (filename string, cleanUp func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
@@ -545,26 +546,6 @@ func createTempDataFile(t *testing.T, content string, fileextension string) (fil
 	return filename,
 		func() {
 			os.Remove(filename)
-		}
-}
-
-func createTempDataFile_old(t *testing.T, content string, fileextension string) (tmpfile *os.File, cleanUp func()) {
-	t.Helper()
-	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if _, err := tmpfile.WriteString(content); err != nil {
-		t.Fatal(err)
-	}
-
-	return tmpfile,
-		func() {
-			if err := tmpfile.Close(); err != nil {
-				t.Fatal(err)
-			}
-			os.Remove(tmpfile.Name())
 		}
 }
 
