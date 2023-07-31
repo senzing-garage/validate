@@ -376,42 +376,6 @@ func TestRead_resource_jsonl(t *testing.T) {
 	}
 }
 
-func TestRead_resource_gzip(t *testing.T) {
-
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
-
-	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
-	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
-	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
-		}
-	}()
-
-	idx := strings.LastIndex(filename, "/")
-	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
-	}
-	result := validator.Read(context.Background())
-
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
-
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
-
-	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
-	}
-}
-
 func TestRead_resource_unknown_extension(t *testing.T) {
 
 	scanner, cleanUpStdout := mockStdout(t)
@@ -475,6 +439,113 @@ func TestRead_resource_bad_url(t *testing.T) {
 	}
 
 	msg := "Fatal error retrieving input-url"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRead_resource_gzip(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	idx := strings.LastIndex(filename, "/")
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+	assert.True(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRead_resource_gzip_bad_url(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:44444444/%s", "bad.gz"),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error retrieving gzipped input-url"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRead_resource_gzip_not_gzipped(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "gz")
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	idx := strings.LastIndex(filename, "/")
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error reading gzipped input-url"
 	assert.Contains(t, got, msg)
 	assert.False(t, result)
 
