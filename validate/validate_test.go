@@ -5,6 +5,8 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -332,6 +334,118 @@ func TestRead_gz_bad(t *testing.T) {
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
 	assert.True(t, result)
+}
+
+// ----------------------------------------------------------------------------
+// test Read resources
+// ----------------------------------------------------------------------------
+
+func TestRead_resource_jsonl(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	idx := strings.LastIndex(filename, "/")
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+	assert.True(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRead_resource_gzip(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	idx := strings.LastIndex(filename, "/")
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Validated 12 lines, 0 were bad"
+	assert.Contains(t, got, msg)
+	assert.True(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestRead_resource_unknown_extension(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "bad")
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	idx := strings.LastIndex(filename, "/")
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 2; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "If this is a valid JSONL resource"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -797,6 +911,20 @@ func createTempGzDataFile(t *testing.T, content string) (filename string, cleanU
 		func() {
 			os.Remove(filename)
 		}
+}
+
+// serve the requested resource on the requested port
+func serveResource(t *testing.T, port int, filename string) *http.Server {
+	t.Helper()
+
+	idx := strings.LastIndex(filename, "/")
+	fs := http.FileServer(http.Dir(filename[:idx]))
+	server := http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: fs,
+	}
+	return &server
+
 }
 
 // capture stdout for testing
