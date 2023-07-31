@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/senzing/go-common/record"
@@ -137,6 +138,7 @@ func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
 
 // opens and reads a JSONL file
 func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
+	jsonFile = filepath.Clean(jsonFile)
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		v.log(5004, jsonFile, err)
@@ -191,6 +193,7 @@ func (v *ValidateImpl) readGZResource(gzURL string) bool {
 
 // opens and reads a JSONL file that has been Gzipped
 func (v *ValidateImpl) readGZFile(gzFile string) bool {
+	gzFile = filepath.Clean(gzFile)
 	gzipfile, err := os.Open(gzFile)
 	if err != nil {
 		v.log(5007, gzFile, err)
