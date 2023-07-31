@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -757,7 +756,7 @@ func TestValidateLines_with_validation_errors_jsonOutput(t *testing.T) {
 // create a tempdata file with the given content and extension
 func createTempDataFile(t *testing.T, content string, fileextension string) (filename string, cleanUp func()) {
 	t.Helper()
-	tmpfile, err := ioutil.TempFile(t.TempDir(), "test.*."+fileextension)
+	tmpfile, err := os.CreateTemp(t.TempDir(), "test.*."+fileextension)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -781,18 +780,19 @@ func createTempDataFile(t *testing.T, content string, fileextension string) (fil
 func createTempGzDataFile(t *testing.T, content string) (filename string, cleanUp func()) {
 	t.Helper()
 
-	tmpfile, err := ioutil.TempFile("", "test.*.jsonl.gz")
-	// tmpfile, err := os.OpenFile("/tmp/q.gz", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
+	tmpfile, err := os.CreateTemp("", "test.*.jsonl.gz")
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer tmpfile.Close()
 	gf := gzip.NewWriter(tmpfile)
+	defer gf.Close()
 	fw := bufio.NewWriter(gf)
-	fw.WriteString(content)
+	if _, err := fw.WriteString(content); err != nil {
+		t.Fatal(err)
+	}
 	fw.Flush()
-	gf.Close()
 	filename = tmpfile.Name()
-	tmpfile.Close()
 	return filename,
 		func() {
 			os.Remove(filename)
