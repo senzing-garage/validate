@@ -4,81 +4,42 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
+	"time"
 
-	"github.com/senzing/senzing-tools/cmdhelper"
-	"github.com/senzing/senzing-tools/envar"
-	"github.com/senzing/senzing-tools/help"
-	"github.com/senzing/senzing-tools/option"
-	"github.com/senzing/validate/examplepackage"
+	"github.com/senzing/go-cmdhelping/cmdhelper"
+	"github.com/senzing/go-cmdhelping/option"
+	"github.com/senzing/validate/validate"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
-	Short string = "validate short description"
+	Short string = "Validates a JSON-lines file."
 	Use   string = "validate"
 	Long  string = `
-validate long description.
-    `
+Welcome to validate!
+Validate that each line of a JSON-lines (JSONL) file conforms to the Generic Entity Specification.
+
+Usage example:
+
+validate --input-url "file:///path/to/json/lines/file.jsonl"
+validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl"
+`
 )
 
 // ----------------------------------------------------------------------------
 // Context variables
 // ----------------------------------------------------------------------------
 
-var ContextBools = []cmdhelper.ContextBool{
-	{
-		Default: cmdhelper.OsLookupEnvBool(envar.EnableAll, false),
-		Envar:   envar.EnableAll,
-		Help:    help.EnableAll,
-		Option:  option.EnableAll,
-	},
-}
-
-var ContextInts = []cmdhelper.ContextInt{
-	{
-		Default: cmdhelper.OsLookupEnvInt(envar.EngineLogLevel, 0),
-		Envar:   envar.EngineLogLevel,
-		Help:    help.EngineLogLevel,
-		Option:  option.EngineLogLevel,
-	},
-}
-
-var ContextStrings = []cmdhelper.ContextString{
-	{
-		Default: cmdhelper.OsLookupEnvString(envar.Configuration, ""),
-		Envar:   envar.Configuration,
-		Help:    help.Configuration,
-		Option:  option.Configuration,
-	},
-	{
-		Default: cmdhelper.OsLookupEnvString(envar.EngineConfigurationJson, ""),
-		Envar:   envar.EngineConfigurationJson,
-		Help:    help.EngineConfigurationJson,
-		Option:  option.EngineConfigurationJson,
-	},
-	{
-		Default: cmdhelper.OsLookupEnvString(envar.LogLevel, "INFO"),
-		Envar:   envar.LogLevel,
-		Help:    help.LogLevel,
-		Option:  option.LogLevel,
-	},
-}
-
-var ContextStringSlices = []cmdhelper.ContextStringSlice{
-	{
-		Default: []string{},
-		Envar:   envar.XtermAllowedHostnames,
-		Help:    help.XtermAllowedHostnames,
-		Option:  option.XtermAllowedHostnames,
-	},
-}
-
-var ContextVariables = &cmdhelper.ContextVariables{
-	Bools:        ContextBools,
-	Ints:         ContextInts,
-	Strings:      ContextStrings,
-	StringSlices: ContextStringSlices,
+var ContextVariables = []option.ContextVariable{
+	option.EngineModuleName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
+	option.InputFileType,
+	option.InputUrl,
+	option.JsonOutput,
+	option.LogLevel,
 }
 
 // ----------------------------------------------------------------------------
@@ -87,7 +48,7 @@ var ContextVariables = &cmdhelper.ContextVariables{
 
 // Since init() is always invoked, define command line parameters.
 func init() {
-	cmdhelper.Init(RootCmd, *ContextVariables)
+	cmdhelper.Init(RootCmd, ContextVariables)
 }
 
 // ----------------------------------------------------------------------------
@@ -105,17 +66,24 @@ func Execute() {
 
 // Used in construction of cobra.Command
 func PreRun(cobraCommand *cobra.Command, args []string) {
-	cmdhelper.PreRun(cobraCommand, args, Use, *ContextVariables)
+	cmdhelper.PreRun(cobraCommand, args, Use, ContextVariables)
 }
 
 // Used in construction of cobra.Command
 func RunE(_ *cobra.Command, _ []string) error {
 	var err error = nil
 	ctx := context.Background()
-	examplePackage := &examplepackage.ExamplePackageImpl{
-		Something: "Main says 'Hi!'",
+
+	validator := &validate.ValidateImpl{
+		InputFileType: viper.GetString(option.InputFileType.Arg),
+		InputUrl:      viper.GetString(option.InputUrl.Arg),
+		JsonOutput:    viper.GetBool(option.JsonOutput.Arg),
+		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
-	err = examplePackage.SaySomething(ctx)
+
+	if !validator.Read(ctx) {
+		err = errors.New("validation failed.")
+	}
 	return err
 }
 
