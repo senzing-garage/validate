@@ -970,6 +970,61 @@ func TestValidateLines_with_validation_errors_jsonOutput(t *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
+// test Read from stdin method
+// ----------------------------------------------------------------------------
+
+// read jsonl file successfully, no record validation errors
+func TestRead_stdin(t *testing.T) {
+
+	// scanner, cleanUp := mockStdout(t)
+	// defer cleanUp()
+
+	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	defer moreCleanUp()
+
+	// err := syscall.Mkfifo(filename, 0666)
+	// if err != nil {
+	// 	t.Fatal("Make named pipe file error:", err)
+	// }
+
+	fmt.Println("open a named pipe file for read.")
+	file, err := os.OpenFile(filename, os.O_CREATE, os.ModeNamedPipe)
+	if err != nil {
+		t.Fatal("Open named pipe file error:", err)
+	}
+
+	os.Stdin = file
+
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Println("stat error")
+	}
+
+	if info.Mode()&os.ModeNamedPipe == os.ModeNamedPipe {
+
+		fmt.Println("stdin piped")
+	} else {
+		fmt.Println("stdin not piped")
+	}
+	// reader := bufio.NewReader(file)
+	// validator := &ValidateImpl{}
+	// result := validator.Read(context.Background())
+	// result := validator.readStdin()
+	// file.Close()
+
+	// var got string = ""
+	// for i := 0; i < 2; i++ {
+	// 	scanner.Scan()
+	// 	got += scanner.Text()
+	// 	got += "\n"
+	// }
+
+	// msg := "Validated 12 lines, 0 were bad"
+	// assert.Contains(t, got, msg)
+	// assert.True(t, result)
+}
+
+// ----------------------------------------------------------------------------
 // Helper functions
 // ----------------------------------------------------------------------------
 
