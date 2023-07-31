@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 )
@@ -21,16 +21,10 @@ func Test_ExecuteCommand_NoInputURL(t *testing.T) {
 	if exError == nil {
 		t.Fatalf("expected Execute() to generated an error")
 	}
-	stderr, err := ioutil.ReadAll(errbuf)
+	stderr, err := io.ReadAll(errbuf)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// stdout, err := ioutil.ReadAll(outbuf)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// fmt.Println("stderr:", string(stderr))
-	// fmt.Println("stdout:", string(stdout))
 	if !strings.Contains(string(stderr), "validation failed") {
 		t.Fatalf("expected input-url parameter error")
 	}
@@ -45,7 +39,7 @@ func Test_ExecuteCommand_Help(t *testing.T) {
 	cmd.SetArgs([]string{"--help"})
 	RootCmd.Execute()
 
-	stdout, err := ioutil.ReadAll(outbuf)
+	stdout, err := io.ReadAll(outbuf)
 	if err != nil {
 		t.Fatal(err)
 	}
