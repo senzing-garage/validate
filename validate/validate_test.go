@@ -448,6 +448,41 @@ func TestRead_resource_unknown_extension(t *testing.T) {
 	}
 }
 
+func TestRead_resource_bad_url(t *testing.T) {
+
+	scanner, cleanUpStdout := mockStdout(t)
+	defer cleanUpStdout()
+
+	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
+	defer cleanUpTempFile()
+	server := serveResource(t, 3000, filename)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	validator := &ValidateImpl{
+		InputUrl: fmt.Sprintf("http://localhost:4444444/%s", "bad.jsonl"),
+	}
+	result := validator.Read(context.Background())
+
+	var got string = ""
+	for i := 0; i < 3; i++ {
+		scanner.Scan()
+		got += scanner.Text()
+		got += "\n"
+	}
+
+	msg := "Fatal error retrieving input-url"
+	assert.Contains(t, got, msg)
+	assert.False(t, result)
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		t.Error(err)
+	}
+}
+
 // ----------------------------------------------------------------------------
 // test Read with Json output
 // ----------------------------------------------------------------------------
