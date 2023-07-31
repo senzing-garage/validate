@@ -123,6 +123,7 @@ func (v *ValidateImpl) SetLogLevel(ctx context.Context, logLevelName string) err
 
 // opens and reads a JSONL resource
 func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
+	// #nosec G107
 	response, err := http.Get(jsonURL)
 
 	if err != nil {
@@ -173,6 +174,7 @@ func (v *ValidateImpl) readStdin() bool {
 
 // opens and reads a JSONL resource that has been Gzipped
 func (v *ValidateImpl) readGZResource(gzURL string) bool {
+	// #nosec G107
 	response, err := http.Get(gzURL)
 	if err != nil {
 		v.log(5009, gzURL, err)
