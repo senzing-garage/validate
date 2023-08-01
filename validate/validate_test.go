@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -347,16 +348,16 @@ func TestRead_resource_jsonl(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, port := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -383,16 +384,16 @@ func TestRead_resource_unknown_extension(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "bad")
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, port := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -419,10 +420,10 @@ func TestRead_resource_bad_url(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, _ := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
@@ -454,16 +455,16 @@ func TestRead_resource_gzip(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, port := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -490,10 +491,10 @@ func TestRead_resource_gzip_bad_url(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, _ := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
@@ -525,16 +526,16 @@ func TestRead_resource_gzip_not_gzipped(t *testing.T) {
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "gz")
 	defer cleanUpTempFile()
-	server := serveResource(t, 3000, filename)
+	server, listener, port := serveResource(t, filename)
 	go func() {
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+		if err := server.Serve(*listener); err != http.ErrServerClosed {
+			log.Fatalf("server.Serve(): %v", err)
 		}
 	}()
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:3000/%s", filename[(idx+1):]),
+		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -1019,17 +1020,21 @@ func createTempGzDataFile(t *testing.T, content string) (filename string, cleanU
 		}
 }
 
-// serve the requested resource on the requested port
-func serveResource(t *testing.T, port int, filename string) *http.Server {
+// serve the requested resource on a random port
+func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, int) {
 	t.Helper()
-
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
 	idx := strings.LastIndex(filename, "/")
 	fs := http.FileServer(http.Dir(filename[:idx]))
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: fs,
 	}
-	return &server
+	return &server, &listener, port
 
 }
 
