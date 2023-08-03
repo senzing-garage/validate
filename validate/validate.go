@@ -267,18 +267,6 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 // Logging --------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
-// Variables
-// ----------------------------------------------------------------------------
-
-var debugOptions []interface{} = []interface{}{
-	&logging.OptionCallerSkip{Value: 5},
-}
-
-var traceOptions []interface{} = []interface{}{
-	&logging.OptionCallerSkip{Value: 5},
-}
-
-// ----------------------------------------------------------------------------
 // logger methods
 
 // Get the Logger singleton.
@@ -304,6 +292,18 @@ func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
 		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
 	}
 }
+
+// ----------------------------------------------------------------------------
+// Variables
+// ----------------------------------------------------------------------------
+
+// var debugOptions []interface{} = []interface{}{
+// 	&logging.OptionCallerSkip{Value: 5},
+// }
+
+// var traceOptions []interface{} = []interface{}{
+// 	&logging.OptionCallerSkip{Value: 5},
+// }
 
 // // Debug.
 // func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
