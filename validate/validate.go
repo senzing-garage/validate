@@ -292,33 +292,3 @@ func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
 		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
 	}
 }
-
-// ----------------------------------------------------------------------------
-// Variables
-// ----------------------------------------------------------------------------
-
-// var debugOptions []interface{} = []interface{}{
-// 	&logging.OptionCallerSkip{Value: 5},
-// }
-
-// var traceOptions []interface{} = []interface{}{
-// 	&logging.OptionCallerSkip{Value: 5},
-// }
-
-// // Debug.
-// func (v *ValidateImpl) debug(messageNumber int, details ...interface{}) {
-// 	details = append(details, debugOptions...)
-// 	v.getLogger().Log(messageNumber, details...)
-// }
-
-// // Trace method entry.
-// func (v *ValidateImpl) traceEntry(messageNumber int, details ...interface{}) {
-// 	details = append(details, traceOptions...)
-// 	v.getLogger().Log(messageNumber, details...)
-// }
-
-// // Trace method exit.
-// func (v *ValidateImpl) traceExit(messageNumber int, details ...interface{}) {
-// 	details = append(details, traceOptions...)
-// 	v.getLogger().Log(messageNumber, details...)
-// }
