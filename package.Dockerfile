@@ -2,7 +2,7 @@
 # Stages
 # -----------------------------------------------------------------------------
 
-ARG IMAGE_GO_BUILDER=golang:1.20.0
+ARG IMAGE_GO_BUILDER=golang:1.20.4
 ARG IMAGE_FPM_BUILDER=dockter/fpm:latest
 ARG IMAGE_FINAL=alpine
 
@@ -11,7 +11,7 @@ ARG IMAGE_FINAL=alpine
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_GO_BUILDER} as go_builder
-ENV REFRESHED_AT=2023-02-22
+ENV REFRESHED_AT=2023-08-01
 LABEL Name="senzing/validate-builder" \
       Maintainer="support@senzing.com" \
       Version="0.0.5"
@@ -31,20 +31,12 @@ COPY . ${GOPATH}/src/${GO_PACKAGE_NAME}
 # Build go program.
 
 WORKDIR ${GOPATH}/src/${GO_PACKAGE_NAME}
-RUN make build
-
-# --- Test go program ---------------------------------------------------------
-
-# Run unit tests.
-
-# RUN go get github.com/jstemmer/go-junit-report \
-#  && mkdir -p /output/go-junit-report \
-#  && go test -v ${GO_PACKAGE_NAME}/... | go-junit-report > /output/go-junit-report/test-report.xml
+RUN make linux/amd64
 
 # Copy binaries to /output.
 
 RUN mkdir -p /output \
-      && cp -R ${GOPATH}/src/${GO_PACKAGE_NAME}/target/*  /output/
+ && cp -R ${GOPATH}/src/${GO_PACKAGE_NAME}/target/*  /output/
 
 # -----------------------------------------------------------------------------
 # Stage: fpm_builder
@@ -53,7 +45,7 @@ RUN mkdir -p /output \
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_FPM_BUILDER} as fpm_builder
-ENV REFRESHED_AT=2023-02-22
+ENV REFRESHED_AT=2023-08-01
 LABEL Name="senzing/validate-fpm-builder" \
       Maintainer="support@senzing.com" \
       Version="0.0.5"
@@ -67,9 +59,9 @@ ARG GO_PACKAGE_NAME
 
 # Copy files from prior stage.
 
-COPY --from=go_builder "/output/linux/*"       "/output/linux/"
+COPY --from=go_builder "/output/linux-amd64/*"    "/output/linux-amd64/"
 
-# Create RPM package.
+# Create Linux RPM package.
 
 RUN fpm \
       --input-type dir \
@@ -78,9 +70,9 @@ RUN fpm \
       --package /output/${PROGRAM_NAME}-${BUILD_VERSION}.rpm \
       --version ${BUILD_VERSION} \
       --iteration ${BUILD_ITERATION} \
-      /output/linux=/usr/bin
+      /output/linux-amd64/=/usr/bin
 
-# Create DEB package.
+# Create Linux DEB package.
 
 RUN fpm \
       --deb-no-default-config-files \
@@ -90,14 +82,14 @@ RUN fpm \
       --output-type deb \
       --package /output/${PROGRAM_NAME}-${BUILD_VERSION}.deb \
       --version ${BUILD_VERSION} \
-      /output/linux/=/usr/bin
+      /output/linux-amd64/=/usr/bin
 
 # -----------------------------------------------------------------------------
 # Stage: final
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_FINAL} as final
-ENV REFRESHED_AT=2023-02-06
+ENV REFRESHED_AT=2023-08-01
 LABEL Name="senzing/validate" \
       Maintainer="support@senzing.com" \
       Version="0.0.5"
@@ -108,7 +100,7 @@ ARG PROGRAM_NAME
 
 # Copy files from prior step.
 
-COPY --from=fpm_builder "/output/linux/${PROGRAM_NAME}" "/output/linux/${PROGRAM_NAME}"
-COPY --from=fpm_builder "/output/*"                     "/output/"
+COPY --from=fpm_builder "/output/*"                                  "/output/"
+COPY --from=fpm_builder "/output/linux-amd64/${PROGRAM_NAME}"        "/output/linux-amd64/${PROGRAM_NAME}"
 
 CMD ["/bin/bash"]

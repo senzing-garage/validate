@@ -42,6 +42,8 @@ var ContextVariables = []option.ContextVariable{
 	option.LogLevel,
 }
 
+var ContextVariables = append(ContextVariablesForMultiPlatform, ContextVariablesForOsArch...)
+
 // ----------------------------------------------------------------------------
 // Private functions
 // ----------------------------------------------------------------------------
