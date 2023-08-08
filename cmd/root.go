@@ -34,13 +34,15 @@ validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/S
 // Context variables
 // ----------------------------------------------------------------------------
 
-var ContextVariables = []option.ContextVariable{
+var ContextVariablesForMultiPlatform = []option.ContextVariable{
 	option.EngineModuleName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
 	option.InputFileType,
 	option.InputUrl,
 	option.JsonOutput,
 	option.LogLevel,
 }
+
+var ContextVariables = append(ContextVariablesForMultiPlatform, ContextVariablesForOsArch...)
 
 // ----------------------------------------------------------------------------
 // Private functions
