@@ -29,7 +29,7 @@ func TestValidateImpl_Read(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -55,7 +55,7 @@ func TestValidateImpl_Read_with_bad_records(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -82,7 +82,7 @@ func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 		LogLevel: "BAD",
 	}
 	result := validator.Read(context.Background())
@@ -106,7 +106,7 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 	defer cleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: "BAD",
+		InputURL: "BAD",
 	}
 	result := validator.Read(context.Background())
 
@@ -129,7 +129,7 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 	defer cleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: "http://bad:bad{BAD=bad@example.com",
+		InputURL: "http://bad:bad{BAD=bad@example.com",
 	}
 	result := validator.Read(context.Background())
 
@@ -152,7 +152,7 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 	defer cleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: "BAD,Really bad",
+		InputURL: "BAD,Really bad",
 	}
 	result := validator.Read(context.Background())
 
@@ -175,7 +175,7 @@ func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 	defer cleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: "file:///badfile.jsonl",
+		InputURL: "file:///badfile.jsonl",
 	}
 	result := validator.Read(context.Background())
 
@@ -238,7 +238,7 @@ func TestValidateImpl_Read_bad_file_type(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -265,7 +265,7 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 
 	validator := &ValidateImpl{
 		InputFileType: "JSONL",
-		InputUrl:      fmt.Sprintf("file://%s", filename),
+		InputURL:      fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -291,11 +291,11 @@ func TestValidateImpl_Read_gz(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGzDataFile(t, testGoodData)
+	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -317,11 +317,11 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGzDataFile(t, testBadData)
+	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
 
@@ -357,7 +357,7 @@ func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
+		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -393,7 +393,7 @@ func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
+		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -428,7 +428,7 @@ func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 	}()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:4444444/%s", "bad.jsonl"),
+		InputURL: fmt.Sprintf("http://localhost:4444444/%s", "bad.jsonl"),
 	}
 	result := validator.Read(context.Background())
 
@@ -453,7 +453,7 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 	scanner, cleanUpStdout := mockStdout(t)
 	defer cleanUpStdout()
 
-	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
+	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
 	defer cleanUpTempFile()
 	server, listener, port := serveResource(t, filename)
 	go func() {
@@ -464,7 +464,7 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
+		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -489,7 +489,7 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 	scanner, cleanUpStdout := mockStdout(t)
 	defer cleanUpStdout()
 
-	filename, cleanUpTempFile := createTempGzDataFile(t, testGoodData)
+	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
 	defer cleanUpTempFile()
 	server, listener, _ := serveResource(t, filename)
 	go func() {
@@ -499,7 +499,7 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 	}()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:44444444/%s", "bad.gz"),
+		InputURL: fmt.Sprintf("http://localhost:44444444/%s", "bad.gz"),
 	}
 	result := validator.Read(context.Background())
 
@@ -510,7 +510,7 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 		got += "\n"
 	}
 
-	msg := "Fatal error retrieving gzipped input-url"
+	msg := "Fatal error retrieving GZIPped input-url"
 	assert.Contains(t, got, msg)
 	assert.False(t, result)
 
@@ -535,7 +535,7 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 
 	idx := strings.LastIndex(filename, "/")
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
+		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
 
@@ -546,9 +546,13 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 		got += "\n"
 	}
 
-	msg := "Fatal error reading gzipped input-url"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error reading GZIPped input-url"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", result, false)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -569,7 +573,7 @@ func TestValidateImpl_Read_jsonOutput(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", filename),
+		InputURL:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	result := validator.Read(context.Background())
@@ -596,7 +600,7 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", filename),
+		InputURL:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	result := validator.Read(context.Background())
@@ -627,7 +631,7 @@ func TestValidateImpl_readJsonlFile(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readJSONLFile(filename)
 
@@ -649,7 +653,7 @@ func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readJSONLFile(filename)
 
@@ -675,7 +679,7 @@ func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", filename),
+		InputURL:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	result := validator.readJSONLFile(filename)
@@ -698,7 +702,7 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl:   fmt.Sprintf("file://%s", filename),
+		InputURL:   fmt.Sprintf("file://%s", filename),
 		JsonOutput: true,
 	}
 	result := validator.readJSONLFile(filename)
@@ -725,13 +729,13 @@ func TestValidateImpl_readGzipFile(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGzDataFile(t, testGoodData)
+	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
-	result := validator.readGZFile(filename)
+	result := validator.readGZIPFile(filename)
 
 	scanner.Scan()
 	got := scanner.Text()
@@ -747,13 +751,13 @@ func TestValidateImpl_readGzipFile_bad(t *testing.T) {
 	scanner, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGzDataFile(t, testBadData)
+	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
-	result := validator.readGZFile(filename)
+	result := validator.readGZIPFile(filename)
 
 	var got string = ""
 	for i := 0; i < 8; i++ {
@@ -776,9 +780,9 @@ func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
 	filename := "/bad.gz"
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
-	result := validator.readGZFile(filename)
+	result := validator.readGZIPFile(filename)
 
 	scanner.Scan()
 	got := scanner.Text()
@@ -798,9 +802,9 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 	defer moreCleanUp()
 
 	validator := &ValidateImpl{
-		InputUrl: fmt.Sprintf("file://%s", filename),
+		InputURL: fmt.Sprintf("file://%s", filename),
 	}
-	result := validator.readGZFile(filename)
+	result := validator.readGZIPFile(filename)
 
 	scanner.Scan()
 	got := scanner.Text()
@@ -998,7 +1002,7 @@ func createTempDataFile(t *testing.T, content string, fileextension string) (fil
 }
 
 // create a temp gzipped datafile with the given content
-func createTempGzDataFile(t *testing.T, content string) (filename string, cleanUp func()) {
+func createTempGZIPDataFile(t *testing.T, content string) (filename string, cleanUp func()) {
 	t.Helper()
 
 	tmpfile, err := os.CreateTemp("", "test.*.jsonl.gz")

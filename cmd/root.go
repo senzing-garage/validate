@@ -78,7 +78,7 @@ func RunE(_ *cobra.Command, _ []string) error {
 
 	validator := &validate.ValidateImpl{
 		InputFileType: viper.GetString(option.InputFileType.Arg),
-		InputUrl:      viper.GetString(option.InputUrl.Arg),
+		InputURL:      viper.GetString(option.InputUrl.Arg),
 		JsonOutput:    viper.GetBool(option.JsonOutput.Arg),
 		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
