@@ -15,7 +15,7 @@ type Initializer interface {
 // Constants
 // ----------------------------------------------------------------------------
 
-// Identfier of the  package found messages having the format "senzing-6501xxxx".
+// Identfier of the  package found messages having the format "senzing-6203xxxx".
 const ComponentId = 6203
 
 // Log message prefix.
@@ -26,12 +26,12 @@ const Prefix = "validate: "
 // ----------------------------------------------------------------------------
 
 // Message templates for g2config implementations.
-var IdMessages = map[int]string{
+var IDMessages = map[int]string{
 	2200: Prefix + "Validating URL string: %s",
 	2201: Prefix + "Validating as a JSONL file.",
-	2203: Prefix + "Validating a GZ file.",
+	2203: Prefix + "Validating a GZIP file.",
 	2204: Prefix + "Validating as a JSONL resource.",
-	2205: Prefix + "Validating a GZ resource.",
+	2205: Prefix + "Validating a GZIP resource.",
 	2210: Prefix + "Validated %d lines, %d were bad.",
 	3001: Prefix + "%d line(s) had no RECORD_ID field.",
 	3002: Prefix + "%d line(s) had no DATA_SOURCE field.",
@@ -49,13 +49,13 @@ var IdMessages = map[int]string{
 	5004: Prefix + "Fatal error opening input file: %s",
 	5005: Prefix + "Fatal error opening stdin.",
 	5006: Prefix + "Fatal error stdin not piped.",
-	5007: Prefix + "Fatal error opening gzipped file: %s",
-	5008: Prefix + "Fatal error reading gzipped file: %s",
-	5009: Prefix + "Fatal error retrieving gzipped input-url: %s",
-	5010: Prefix + "Fatal error reading gzipped input-url: %s",
+	5007: Prefix + "Fatal error opening GZIPped file: %s",
+	5008: Prefix + "Fatal error reading GZIPped file: %s",
+	5009: Prefix + "Fatal error retrieving GZIPped input-url: %s",
+	5010: Prefix + "Fatal error reading GZIPped input-url: %s",
 	5011: Prefix + "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type).",
 	5012: Prefix + "If this is a valid JSONL resource, please rename with the .jsonl extension or use the file type override (--file-type).",
 }
 
 // Status strings for specific messages.
-var IdStatuses = map[int]string{}
+var IDStatuses = map[int]string{}

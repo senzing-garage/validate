@@ -22,7 +22,7 @@ import (
 
 type ValidateImpl struct {
 	InputFileType string
-	InputUrl      string
+	InputURL      string
 	JsonOutput    bool
 	logger        logging.LoggingInterface
 	LogLevel      string
@@ -47,22 +47,22 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 		v.log(3009, logLevel, err)
 	}
 
-	InputUrlLen := len(v.InputUrl)
+	inputURLLen := len(v.InputURL)
 
-	if InputUrlLen == 0 {
+	if inputURLLen == 0 {
 		//assume stdin
 		return v.readStdin()
 	}
 
 	//This assumes the URL includes a schema and path so, minimally:
 	//  "s://p" where the schema is 's' and 'p' is the complete path
-	if InputUrlLen < 5 {
-		v.log(5000, v.InputUrl)
+	if inputURLLen < 5 {
+		v.log(5000, v.InputURL)
 		return false
 	}
 
-	v.log(2200, v.InputUrl)
-	u, err := url.Parse(v.InputUrl)
+	v.log(2200, v.InputURL)
+	u, err := url.Parse(v.InputURL)
 	if err != nil {
 		v.log(5001, err)
 		return false
@@ -73,17 +73,17 @@ func (v *ValidateImpl) Read(ctx context.Context) bool {
 			return v.readJSONLFile(u.Path)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
 			v.log(2203)
-			return v.readGZFile(u.Path)
+			return v.readGZIPFile(u.Path)
 		} else {
 			v.log(5011)
 		}
 	} else if u.Scheme == "http" || u.Scheme == "https" {
 		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
 			v.log(2204)
-			return v.readJSONLResource(v.InputUrl)
+			return v.readJSONLResource(v.InputURL)
 		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
 			v.log(2205)
-			return v.readGZResource(v.InputUrl)
+			return v.readGZIPResource(v.InputURL)
 		} else {
 			v.log(5012)
 		}
@@ -172,8 +172,8 @@ func (v *ValidateImpl) readStdin() bool {
 
 // ----------------------------------------------------------------------------
 
-// opens and reads a JSONL resource that has been Gzipped
-func (v *ValidateImpl) readGZResource(gzURL string) bool {
+// opens and reads a JSONL resource that has been GZIPped
+func (v *ValidateImpl) readGZIPResource(gzURL string) bool {
 	// #nosec G107
 	response, err := http.Get(gzURL)
 	if err != nil {
@@ -193,8 +193,8 @@ func (v *ValidateImpl) readGZResource(gzURL string) bool {
 
 // ----------------------------------------------------------------------------
 
-// opens and reads a JSONL file that has been Gzipped
-func (v *ValidateImpl) readGZFile(gzFile string) bool {
+// opens and reads a JSONL file that has been GZIPped
+func (v *ValidateImpl) readGZIPFile(gzFile string) bool {
 	gzFile = filepath.Clean(gzFile)
 	gzipfile, err := os.Open(gzFile)
 	if err != nil {
@@ -219,7 +219,7 @@ func (v *ValidateImpl) readGZFile(gzFile string) bool {
 func (v *ValidateImpl) validateLines(reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 	totalLines := 0
-	noRecordId := 0
+	noRecordID := 0
 	noDataSource := 0
 	malformed := 0
 	badRecord := 0
@@ -233,7 +233,7 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 				if err != nil {
 					if strings.Contains(err.Error(), "RECORD_ID") {
 						v.log(3005, totalLines)
-						noRecordId++
+						noRecordID++
 					} else if strings.Contains(err.Error(), "DATA_SOURCE") {
 						v.log(3006, totalLines)
 						noDataSource++
@@ -248,8 +248,8 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 			}
 		}
 	}
-	if noRecordId > 0 {
-		v.log(3001, noRecordId)
+	if noRecordID > 0 {
+		v.log(3001, noRecordID)
 	}
 	if noDataSource > 0 {
 		v.log(3002, noDataSource)
@@ -260,7 +260,7 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 	if badRecord > 0 {
 		v.log(3004, badRecord)
 	}
-	v.log(2210, totalLines, noRecordId+noDataSource+malformed+badRecord)
+	v.log(2210, totalLines, noRecordID+noDataSource+malformed+badRecord)
 }
 
 // ----------------------------------------------------------------------------
@@ -276,7 +276,7 @@ func (v *ValidateImpl) getLogger() logging.LoggingInterface {
 		options := []interface{}{
 			&logging.OptionCallerSkip{Value: 4},
 		}
-		v.logger, err = logging.NewSenzingToolsLogger(ComponentId, IdMessages, options...)
+		v.logger, err = logging.NewSenzingToolsLogger(ComponentId, IDMessages, options...)
 		if err != nil {
 			panic(err)
 		}
@@ -289,6 +289,6 @@ func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
 	if v.JsonOutput {
 		v.getLogger().Log(messageNumber, details...)
 	} else {
-		fmt.Println(fmt.Sprintf(IdMessages[messageNumber], details...))
+		fmt.Println(fmt.Sprintf(IDMessages[messageNumber], details...))
 	}
 }
