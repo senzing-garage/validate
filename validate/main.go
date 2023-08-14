@@ -15,7 +15,7 @@ type Initializer interface {
 // Constants
 // ----------------------------------------------------------------------------
 
-// Identfier of the  package found messages having the format "senzing-6501xxxx".
+// Identfier of the  package found messages having the format "senzing-6203xxxx".
 const ComponentId = 6203
 
 // Log message prefix.
