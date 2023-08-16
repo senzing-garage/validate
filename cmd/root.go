@@ -37,8 +37,8 @@ validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/S
 var ContextVariablesForMultiPlatform = []option.ContextVariable{
 	option.EngineModuleName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
 	option.InputFileType,
-	option.InputUrl,
-	option.JsonOutput,
+	option.InputURL,
+	option.JSONOutput,
 	option.LogLevel,
 }
 
@@ -78,8 +78,8 @@ func RunE(_ *cobra.Command, _ []string) error {
 
 	validator := &validate.ValidateImpl{
 		InputFileType: viper.GetString(option.InputFileType.Arg),
-		InputURL:      viper.GetString(option.InputUrl.Arg),
-		JsonOutput:    viper.GetBool(option.JsonOutput.Arg),
+		InputURL:      viper.GetString(option.InputURL.Arg),
+		JsonOutput:    viper.GetBool(option.JSONOutput.Arg),
 		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
 
