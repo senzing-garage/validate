@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -
 
+## [0.0.3] - 2023-08-17
+
+### Changed in 0.0.3
+
+- Refactor to use new option names
+- Update dependencies
+  - github.com/senzing/go-cmdhelping v0.1.6
+
 ## [0.0.2] - 2023-08-07
 
 ### Changed in 0.0.2
