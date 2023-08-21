@@ -1,9 +1,10 @@
 module github.com/senzing/validate
 
 go 1.20
+toolchain go1.21.0
 
 require (
-	github.com/senzing/go-cmdhelping v0.1.6
+	github.com/senzing/go-cmdhelping v0.1.7
 	github.com/senzing/go-common v0.2.13
 	github.com/senzing/go-logging v1.3.2
 	github.com/spf13/cobra v1.7.0
