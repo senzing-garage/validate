@@ -2,8 +2,6 @@ module github.com/senzing/validate
 
 go 1.21
 
-toolchain go1.21.0
-
 require (
 	github.com/senzing/go-cmdhelping v0.1.8
 	github.com/senzing/go-common v0.2.14
