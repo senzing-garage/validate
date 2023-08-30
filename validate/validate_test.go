@@ -978,12 +978,6 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 	validator := &ValidateImpl{}
 	validator.validateLines(strings.NewReader(testBadData))
 
-	// var got string = ""
-	// for i := 0; i < 8; i++ {
-	// 	scanner.Scan()
-	// 	got += scanner.Text()
-	// 	got += "\n"
-	// }
 	w.Close()
 	out, _ := io.ReadAll(r)
 	got := string(out)
@@ -1100,23 +1094,6 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 	}
 	return &server, &listener, port
 
-}
-
-// capture stdout for testing
-func mockStdoutX(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
-	t.Helper()
-	origStdout := os.Stdout
-	reader, writer, err := os.Pipe()
-	if err != nil {
-		assert.Fail(t, "couldn't get os Pipe: %v", err)
-	}
-	os.Stdout = writer
-
-	return bufio.NewScanner(reader),
-		func() {
-			//clean-up
-			os.Stdout = origStdout
-		}
 }
 
 // capture stdout for testing
