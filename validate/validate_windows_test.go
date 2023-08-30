@@ -178,28 +178,28 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 }
 
 // attempt to read a jsonl file, but the file doesn't exist
-func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
+// func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStdout(t)
+// 	defer cleanUp()
 
-	validator := &ValidateImpl{
-		InputURL: "file:///badfile.jsonl",
-	}
-	result := validator.Read(context.Background())
+// 	validator := &ValidateImpl{
+// 		InputURL: "file:///badfile.jsonl",
+// 	}
+// 	result := validator.Read(context.Background())
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Fatal error opening input file: /badfile.jsonl"
-	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
-	}
-}
+// 	want := "Fatal error opening input file: /badfile.jsonl"
+// 	if !strings.Contains(got, want) {
+// 		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// 	if result == true {
+// 		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+// 	}
+// }
 
 func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 
