@@ -2,8 +2,6 @@ module github.com/senzing/validate
 
 go 1.21
 
-toolchain go1.21.0
-
 require (
 	github.com/senzing/go-cmdhelping v0.1.8
 	github.com/senzing/go-common v0.2.14
@@ -21,7 +19,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/senzing/go-messaging v1.3.2 // indirect

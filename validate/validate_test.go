@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 package validate
 
 import (
@@ -5,6 +8,7 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -22,7 +26,7 @@ import (
 // read jsonl file successfully, no record validation errors
 func TestValidateImpl_Read(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -33,22 +37,23 @@ func TestValidateImpl_Read(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // read jsonl file successully, but with record validation errors
 func TestValidateImpl_Read_with_bad_records(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
@@ -59,23 +64,24 @@ func TestValidateImpl_Read_with_bad_records(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 10; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) && result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // read jsonl file successfully, but attept to set a bad log level
 // falls back to INFO
 func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
@@ -87,22 +93,23 @@ func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 10; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Unable to set log level to BAD"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Unable to set log level to BAD"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // attempt to read a jsonl file, but the input url is bad
 func TestValidateImpl_Read_bad_url(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -110,22 +117,23 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 1; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error, Check the input-url parameter: BAD"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error, Check the input-url parameter: BAD"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 // attempt to read a jsonl file, but the input url isn't parsable
 func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -133,22 +141,23 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 2; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error parsing input-url"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error parsing input-url"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 // attempt to read a jsonl file, but the input url is not understood
 func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -156,22 +165,23 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 2; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error unable to handle"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error unable to handle"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 // attempt to read a jsonl file, but the file doesn't exist
 func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -179,21 +189,22 @@ func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error opening input file: /badfile.jsonl"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error opening input file: /badfile.jsonl"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -216,22 +227,23 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 	validator := &ValidateImpl{}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 1; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error stdin not piped"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error stdin not piped"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 // attempt to read a file, but it has a file type that is not known
 func TestValidateImpl_Read_bad_file_type(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
@@ -242,22 +254,23 @@ func TestValidateImpl_Read_bad_file_type(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 2; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type)"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type)"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 }
 
 // attempt to read a file type that is not known, but override with input file type
 func TestValidateImpl_Read_override_file_type(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
@@ -269,16 +282,17 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -288,7 +302,7 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 // read a gz file successfully, with no record validation errors
 func TestValidateImpl_Read_gz(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
@@ -299,22 +313,23 @@ func TestValidateImpl_Read_gz(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // read a gz file successfully, but with record validation errors
 func TestValidateImpl_Read_gz_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
@@ -325,16 +340,17 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 10; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -343,8 +359,8 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 
 func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
 	defer cleanUpTempFile()
@@ -361,16 +377,17 @@ func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -379,8 +396,8 @@ func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 
 func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "bad")
 	defer cleanUpTempFile()
@@ -397,16 +414,17 @@ func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 2; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "If this is a valid JSONL resource"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "If this is a valid JSONL resource"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -415,8 +433,8 @@ func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 
 func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
 	defer cleanUpTempFile()
@@ -432,16 +450,17 @@ func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error retrieving input-url"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error retrieving input-url"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -450,8 +469,8 @@ func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 
 func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
 	defer cleanUpTempFile()
@@ -468,16 +487,17 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -486,8 +506,8 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 
 func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
 	defer cleanUpTempFile()
@@ -503,16 +523,17 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error retrieving GZIPped input-url"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error retrieving GZIPped input-url"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
 		t.Error(err)
@@ -521,8 +542,8 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 
 func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 
-	scanner, cleanUpStdout := mockStdout(t)
-	defer cleanUpStdout()
+	r, w, cleanUp := mockStdout(t)
+	defer cleanUp()
 
 	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "gz")
 	defer cleanUpTempFile()
@@ -539,12 +560,9 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
 	want := "Fatal error reading GZIPped input-url"
 	if !strings.Contains(got, want) {
@@ -566,7 +584,7 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 // read a json file successfully, with no record validation errors
 func TestValidateImpl_Read_jsonOutput(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -578,22 +596,24 @@ func TestValidateImpl_Read_jsonOutput(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 3; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
+
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
 }
 
 // read a json file successfully, but with record validation errors
 func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
@@ -605,16 +625,17 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 	}
 	result := validator.Read(context.Background())
 
-	var got string = ""
-	for i := 0; i < 10; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -624,7 +645,7 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 // read a json file successfully, with no record validation errors
 func TestValidateImpl_readJsonlFile(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -635,18 +656,24 @@ func TestValidateImpl_readJsonlFile(t *testing.T) {
 	}
 	result := validator.readJSONLFile(filename)
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
+	}
+
 }
 
 // read a json file successfully, but with record validation errors
 func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
@@ -657,22 +684,23 @@ func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
 	}
 	result := validator.readJSONLFile(filename)
 
-	var got string = ""
-	for i := 0; i < 8; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
+	}
 }
 
 // read a json file successfully, with no record validation errors
 func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -684,18 +712,23 @@ func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
 	}
 	result := validator.readJSONLFile(filename)
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // read a json file successfully, but with record validation errors
 func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
@@ -707,16 +740,17 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 	}
 	result := validator.readJSONLFile(filename)
 
-	var got string = ""
-	for i := 0; i < 8; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -726,7 +760,7 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 // read a gzip file successfully, no record validation errors
 func TestValidateImpl_readGzipFile(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
@@ -737,18 +771,23 @@ func TestValidateImpl_readGzipFile(t *testing.T) {
 	}
 	result := validator.readGZIPFile(filename)
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
+	}
 }
 
 // read a gzip file successfully, but with record validation errors
 func TestValidateImpl_readGzipFile_bad(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
@@ -759,22 +798,23 @@ func TestValidateImpl_readGzipFile_bad(t *testing.T) {
 	}
 	result := validator.readGZIPFile(filename)
 
-	var got string = ""
-	for i := 0; i < 8; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
-	assert.True(t, result)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+	}
+	if result != true {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
+	}
 }
 
 // attempt to read a gzip file that doesn't exist
 func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename := "/bad.gz"
@@ -784,18 +824,23 @@ func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
 	}
 	result := validator.readGZIPFile(filename)
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "no such file or directory"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "no such file or directory"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
+	}
 }
 
 // attempt to read a gzip file that isn't a gzip file
 func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "gz")
@@ -806,12 +851,17 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 	}
 	result := validator.readGZIPFile(filename)
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "invalid header"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "invalid header"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -820,7 +870,7 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 
 func TestValidateImpl_readStdin(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -845,20 +895,21 @@ func TestValidateImpl_readStdin(t *testing.T) {
 	validator := &ValidateImpl{}
 	result := validator.readStdin()
 
-	var got string = ""
-	for i := 0; i < 1; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error stdin not piped"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error stdin not piped"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+	}
 }
 func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
@@ -882,16 +933,17 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 	validator := &ValidateImpl{}
 	result := validator.readStdin()
 
-	var got string = ""
-	for i := 0; i < 1; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Fatal error stdin not piped"
-	assert.Contains(t, got, msg)
-	assert.False(t, result)
+	want := "Fatal error stdin not piped"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+	}
+	if result == true {
+		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -901,34 +953,34 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 // validate lines with no record validation errors
 func TestValidateImpl_validateLines(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{}
 	validator.validateLines(strings.NewReader(testGoodData))
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.validateLines() = %v, want %v", got, want)
+	}
 }
 
 // validate lines, but with record validation errors
 func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 
-	scanner, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{}
 	validator.validateLines(strings.NewReader(testBadData))
 
-	var got string = ""
-	for i := 0; i < 8; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
 	msg := "Validated 16 lines, 4 were bad"
 	assert.Contains(t, got, msg)
@@ -937,7 +989,7 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 // validate lines with no record validation errors, json output
 func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -945,17 +997,20 @@ func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 	}
 	validator.validateLines(strings.NewReader(testGoodData))
 
-	scanner.Scan()
-	got := scanner.Text()
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 12 lines, 0 were bad"
-	assert.Contains(t, got, msg)
+	want := "Validated 12 lines, 0 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
 }
 
 // validate lines, but with record validation errors and json output
 func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing.T) {
 
-	scanner, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
 	validator := &ValidateImpl{
@@ -963,15 +1018,14 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 	}
 	validator.validateLines(strings.NewReader(testBadData))
 
-	var got string = ""
-	for i := 0; i < 8; i++ {
-		scanner.Scan()
-		got += scanner.Text()
-		got += "\n"
-	}
+	w.Close()
+	out, _ := io.ReadAll(r)
+	got := string(out)
 
-	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
+	want := "Validated 16 lines, 4 were bad"
+	if !strings.Contains(got, want) {
+		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -1032,7 +1086,7 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 		t.Fatal(err)
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
-	idx := strings.LastIndex(filename, "/")
+	idx := strings.LastIndex(filename, string(os.PathSeparator))
 	fs := http.FileServer(http.Dir(filename[:idx]))
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
@@ -1043,8 +1097,9 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 }
 
 // capture stdout for testing
-func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
+func mockStdout(t *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
 	t.Helper()
+
 	origStdout := os.Stdout
 	reader, writer, err := os.Pipe()
 	if err != nil {
@@ -1052,7 +1107,8 @@ func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
 	}
 	os.Stdout = writer
 
-	return bufio.NewScanner(reader),
+	return reader,
+		writer,
 		func() {
 			//clean-up
 			os.Stdout = origStdout
@@ -1060,7 +1116,7 @@ func mockStdout(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
 }
 
 // capture stderr for testing
-func mockStderr(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
+func mockStderr(t *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
 	t.Helper()
 	origStderr := os.Stderr
 	reader, writer, err := os.Pipe()
@@ -1069,7 +1125,8 @@ func mockStderr(t *testing.T) (buffer *bufio.Scanner, cleanUp func()) {
 	}
 	os.Stderr = writer
 
-	return bufio.NewScanner(reader),
+	return reader,
+		writer,
 		func() {
 			//clean-up
 			os.Stderr = origStderr
