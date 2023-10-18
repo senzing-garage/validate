@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/senzing/go-cmdhelping v0.1.8
-	github.com/senzing/go-common v0.3.0
+	github.com/senzing/go-common v0.3.1
 	github.com/senzing/go-logging v1.3.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
