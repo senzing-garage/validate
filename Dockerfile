@@ -10,7 +10,7 @@ ARG IMAGE_FINAL=senzing/senzingapi-runtime:3.7.1
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_GO_BUILDER} as go_builder
-ENV REFRESHED_AT=2023-10-03
+ENV REFRESHED_AT=2023-10-02
 LABEL Name="senzing/validate-builder" \
       Maintainer="support@senzing.com" \
       Version="0.0.4"

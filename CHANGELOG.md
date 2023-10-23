@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -
 
+## [0.0.5] - 2023-10-23
+
+### Changed in 0.0.5
+
+- Update to [template.go](https://github.com/Senzing/template-go)
+- Update dependencies
+  - github.com/senzing/go-cmdhelping v0.1.9
+  - github.com/senzing/go-common v0.3.1
+  - github.com/senzing/go-logging v1.3.3
+  - github.com/spf13/viper v1.17.0
+
 ## [0.0.4] - 2023-10-03
 
 ### Changed in 0.0.4
