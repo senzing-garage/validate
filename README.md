@@ -57,7 +57,7 @@ senzing-tools validate [flags]
 
 ### Using command line options
 
-1. :pencil2: Specify database using command line option.
+1. :pencil2: Specify file URL using command line option.
    Example:
 
     ```console
@@ -69,7 +69,7 @@ senzing-tools validate [flags]
 
 ### Using environment variables
 
-1. :pencil2: Specify database using environment variable.
+1. :pencil2: Specify file URL using environment variable.
    Example:
 
     ```console
@@ -81,7 +81,7 @@ senzing-tools validate [flags]
 
 ### Using Docker
 
-This usage shows how to initialze a database with a Docker container.
+This usage shows how to validate a file with a Docker container.
 
 1. :pencil2: Run `senzing/senzing-tools`.
    Example:
@@ -101,7 +101,7 @@ This usage shows how to initialze a database with a Docker container.
 - **[SENZING_TOOLS_INPUT_FILE_TYPE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_file_type)**
 - **[SENZING_TOOLS_INPUT_URL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_url)**
 - **[SENZING_TOOLS_JSON_OUTPUT](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_json_output)**
-- **[SENZING_TOOLS_ENGINE_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_engine_log_level)**
+- **[SENZING_TOOLS_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_log_level)**
 
 ## References
 
