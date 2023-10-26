@@ -20,14 +20,14 @@ const (
 	Short string = "Validates a JSON-lines file."
 	Use   string = "validate"
 	Long  string = `
-Welcome to validate!
-Validate that each line of a JSON-lines (JSONL) file conforms to the Generic Entity Specification.
+	Welcome to validate!
+	Validate that each line of a JSON-lines (JSONL) file conforms to the Generic Entity Specification.
 
-Usage example:
+	Usage example:
 
-validate --input-url "file:///path/to/json/lines/file.jsonl"
-validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl"
-`
+	validate --input-url "file:///path/to/json/lines/file.jsonl"
+	validate --input-url "https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl"
+	`
 )
 
 // ----------------------------------------------------------------------------
