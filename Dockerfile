@@ -2,8 +2,8 @@
 # Stages
 # -----------------------------------------------------------------------------
 
-ARG IMAGE_GO_BUILDER=golang:1.21.0-bullseye@sha256:02f350d8452d3f9693a450586659ecdc6e40e9be8f8dfc6d402300d87223fdfa
-ARG IMAGE_FINAL=senzing/senzingapi-runtime:3.7.1
+ARG IMAGE_GO_BUILDER=golang:1.21.4-bullseye
+ARG IMAGE_FINAL=senzing/senzingapi-runtime:3.8.0
 
 # -----------------------------------------------------------------------------
 # Stage: go_builder
@@ -13,7 +13,7 @@ FROM ${IMAGE_GO_BUILDER} as go_builder
 ENV REFRESHED_AT=2023-10-02
 LABEL Name="senzing/validate-builder" \
       Maintainer="support@senzing.com" \
-      Version="0.0.4"
+      Version="0.1.0"
 
 # Copy local files from the Git repository.
 
@@ -42,7 +42,7 @@ FROM ${IMAGE_FINAL} as final
 ENV REFRESHED_AT=2023-10-03
 LABEL Name="senzing/validate" \
       Maintainer="support@senzing.com" \
-      Version="0.0.4"
+      Version="0.1.0"
 
 # Copy files from prior stage.
 

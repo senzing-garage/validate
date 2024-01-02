@@ -10,15 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -
 
+## [0.1.0] - 2024-01-02
+
+### Changed in 0.1.0
+
+- Renamed module to `github.com/senzing-garage/validate`
+- Refactor to [template-go](https://github.com/senzing-garage/template-go)
+- Update dependencies
+  - github.com/senzing-garage/go-cmdhelping v0.2.0
+  - github.com/senzing-garage/go-common v0.4.0
+  - github.com/senzing-garage/go-logging v1.4.0
+  - github.com/spf13/cobra v1.8.0
+  - github.com/spf13/viper v1.18.2
+
 ## [0.0.5] - 2023-10-23
 
 ### Changed in 0.0.5
 
-- Update to [template.go](https://github.com/Senzing/template-go)
+- Update to [template.go](https://github.com/senzing-garage/template-go)
 - Update dependencies
-  - github.com/senzing/go-cmdhelping v0.1.9
-  - github.com/senzing/go-common v0.3.1
-  - github.com/senzing/go-logging v1.3.3
+  - github.com/senzing-garage/go-cmdhelping v0.1.9
+  - github.com/senzing-garage/go-common v0.3.1
+  - github.com/senzing-garage/go-logging v1.3.3
   - github.com/spf13/viper v1.17.0
 
 ## [0.0.4] - 2023-10-03
@@ -27,8 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add testing on Windows
 - Update dependencies
-  - github.com/senzing/go-cmdhelping v0.1.8
-  - github.com/senzing/go-common v0.3.0
+  - github.com/senzing-garage/go-cmdhelping v0.1.8
+  - github.com/senzing-garage/go-common v0.3.0
 
 ## [0.0.3] - 2023-08-17
 
@@ -36,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactor to use new option names
 - Update dependencies
-  - github.com/senzing/go-cmdhelping v0.1.6
+  - github.com/senzing-garage/go-cmdhelping v0.1.6
 
 ## [0.0.2] - 2023-08-07
 
@@ -45,9 +58,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update unit tests
 - Refactor to `template-go`
 - Update dependencies
-  - github.com/senzing/go-cmdhelping v0.1.5
-  - github.com/senzing/go-common v0.2.11
-  - github.com/senzing/go-logging v1.3.2
+  - github.com/senzing-garage/go-cmdhelping v0.1.5
+  - github.com/senzing-garage/go-common v0.2.11
+  - github.com/senzing-garage/go-logging v1.3.2
 
 ## [0.0.1] - 2023-07-31
 

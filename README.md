@@ -1,19 +1,35 @@
 # validate
 
+If you are beginning your journey with
+[Senzing](https://senzing.com/),
+please start with
+[Senzing Quick Start guides](https://docs.senzing.com/quickstart/).
+
+You are in the
+[Senzing Garage](https://github.com/senzing-garage)
+where projects are "tinkered" on.
+Although this GitHub repository may help you understand an approach to using Senzing,
+it's not considered to be "production ready" and is not considered to be part of the Senzing product.
+Heck, it may not even be appropriate for your application of Senzing!
+
 ## Synopsis
 
 `validate` is a command in the
-[senzing-tools](https://github.com/Senzing/senzing-tools)
+[senzing-tools](https://github.com/senzing-garage/senzing-tools)
 suite of tools.
 This command validates that a JSONL file is properly formatted and each line
 contains sufficient key-value pairs for Senzing to each as a record.  It is
 highly recommend that this code be taken and extended to validate JSONL records
 to meet your needs.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/senzing/validate.svg)](https://pkg.go.dev/github.com/senzing/validate)
-[![Go Report Card](https://goreportcard.com/badge/github.com/senzing/validate)](https://goreportcard.com/report/github.com/senzing/validate)
-[![go-test.yaml](https://github.com/Senzing/validate/actions/workflows/go-test.yaml/badge.svg)](https://github.com/Senzing/validate/actions/workflows/go-test.yaml)
-[![License](https://img.shields.io/badge/License-Apache2-brightgreen.svg)](https://github.com/Senzing/validate/blob/main/LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/github.com/senzing-garage/validate.svg)](https://pkg.go.dev/github.com/senzing-garage/validate)
+[![Go Report Card](https://goreportcard.com/badge/github.com/senzing-garage/validate)](https://goreportcard.com/report/github.com/senzing-garage/validate)
+[![License](https://img.shields.io/badge/License-Apache2-brightgreen.svg)](https://github.com/senzing-garage/validate/blob/main/LICENSE)
+
+[![gosec.yaml](https://github.com/senzing-garage/validate/actions/workflows/gosec.yaml/badge.svg)](https://github.com/senzing-garage/validate/actions/workflows/gosec.yaml)
+[![go-test-linux.yaml](https://github.com/senzing-garage/validate/actions/workflows/go-test-linux.yaml/badge.svg)](https://github.com/senzing-garage/validate/actions/workflows/go-test-linux.yaml)
+[![go-test-darwin.yaml](https://github.com/senzing-garage/validate/actions/workflows/go-test-darwin.yaml/badge.svg)](https://github.com/senzing-garage/validate/actions/workflows/go-test-darwin.yaml)
+[![go-test-windows.yaml](https://github.com/senzing-garage/validate/actions/workflows/go-test-windows.yaml/badge.svg)](https://github.com/senzing-garage/validate/actions/workflows/go-test-windows.yaml)
 
 ## Overview
 
@@ -35,9 +51,9 @@ extend it to other file types.
 ## Install
 
 1. The `validate` command is installed with the
-   [senzing-tools](https://github.com/Senzing/senzing-tools)
+   [senzing-tools](https://github.com/senzing-garage/senzing-tools)
    suite of tools.
-   See senzing-tools [install](https://github.com/Senzing/senzing-tools#install).
+   See senzing-tools [install](https://github.com/senzing-garage/senzing-tools#install).
 
 ## Use
 
@@ -98,10 +114,10 @@ This usage shows how to validate a file with a Docker container.
 
 ### Parameters
 
-- **[SENZING_TOOLS_INPUT_FILE_TYPE](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_file_type)**
-- **[SENZING_TOOLS_INPUT_URL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_url)**
-- **[SENZING_TOOLS_JSON_OUTPUT](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_json_output)**
-- **[SENZING_TOOLS_LOG_LEVEL](https://github.com/Senzing/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_log_level)**
+- **[SENZING_TOOLS_INPUT_FILE_TYPE](https://github.com/senzing-garage/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_file_type)**
+- **[SENZING_TOOLS_INPUT_URL](https://github.com/senzing-garage/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_input_url)**
+- **[SENZING_TOOLS_JSON_OUTPUT](https://github.com/senzing-garage/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_json_output)**
+- **[SENZING_TOOLS_LOG_LEVEL](https://github.com/senzing-garage/knowledge-base/blob/main/lists/environment-variables.md#senzing_tools_log_level)**
 
 ## References
 

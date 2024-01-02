@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/senzing/go-common/record"
-	"github.com/senzing/go-logging/logging"
+	"github.com/senzing-garage/go-common/record"
+	"github.com/senzing-garage/go-logging/logging"
 )
 
 // ----------------------------------------------------------------------------
