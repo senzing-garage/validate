@@ -2,7 +2,7 @@
 # Stages
 # -----------------------------------------------------------------------------
 
-ARG IMAGE_GO_BUILDER=golang:1.21.0-bullseye@sha256:02f350d8452d3f9693a450586659ecdc6e40e9be8f8dfc6d402300d87223fdfa
+ARG IMAGE_GO_BUILDER=golang:1.21.4-bullseye
 ARG IMAGE_FPM_BUILDER=dockter/fpm:latest
 ARG IMAGE_FINAL=alpine
 
@@ -14,7 +14,7 @@ FROM ${IMAGE_GO_BUILDER} as go_builder
 ENV REFRESHED_AT=2023-10-03
 LABEL Name="senzing/validate-builder" \
       Maintainer="support@senzing.com" \
-      Version="0.0.4"
+      Version="0.1.0"
 
 # Build arguments.
 
@@ -48,7 +48,7 @@ FROM ${IMAGE_FPM_BUILDER} as fpm_builder
 ENV REFRESHED_AT=2023-10-03
 LABEL Name="senzing/validate-fpm-builder" \
       Maintainer="support@senzing.com" \
-      Version="0.0.4"
+      Version="0.1.0"
 
 # Use arguments from prior stage.
 
@@ -92,7 +92,7 @@ FROM ${IMAGE_FINAL} as final
 ENV REFRESHED_AT=2023-08-01
 LABEL Name="senzing/validate" \
       Maintainer="support@senzing.com" \
-      Version="0.0.5"
+      Version="0.1.0"
 
 # Use arguments from prior stage.
 
