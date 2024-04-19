@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -
 
+## [0.1.1] - 2024-04-19
+
+### Changed in 0.1.1
+
+- Update dependencies
+  - github.com/senzing-garage/go-cmdhelping v0.2.1
+  - github.com/senzing-garage/go-helpers v0.5.1
+  - github.com/senzing-garage/go-logging v1.4.1
+  - github.com/stretchr/testify v1.9.0
+
 ## [0.1.0] - 2024-01-02
 
 ### Changed in 0.1.0
