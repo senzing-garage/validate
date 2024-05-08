@@ -2,6 +2,9 @@ name: go test darwin
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   go-test-darwin:
     name: "go test with OS: ${{ matrix.os }}; Go: ${{ matrix.go }}"

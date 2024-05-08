@@ -2,6 +2,9 @@ name: go test windows
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   go-test-windows:
     name: "go test with OS: ${{ matrix.os }}; Go: ${{ matrix.go }}"
