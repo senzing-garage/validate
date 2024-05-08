@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/senzing-garage/go-common/record"
+	"github.com/senzing-garage/go-helpers/record"
 	"github.com/senzing-garage/go-logging/logging"
 )
 
