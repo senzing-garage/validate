@@ -26,4 +26,15 @@ jobs:
           go-version: ${{ matrix.go }}
 
       - name: run go test
-        run: go test -v -p 1 ./...
+        run: go test -v -p 1 -coverprofile=./cover.out -covermode=atomic -coverpkg=./... ./...
+
+      - name: Store coverage file
+        uses: actions/upload-artifact@v4
+        with:
+          name: cover.out
+          path: ./cover.out
+
+  coverage:
+    name: coverage
+    needs: go-test-linux
+    uses: senzing-factory/build-resources/.github/workflows/go-coverage.yaml@v2

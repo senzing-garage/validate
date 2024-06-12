@@ -6,7 +6,7 @@ import "context"
 // Types
 // ----------------------------------------------------------------------------
 
-type Initializer interface {
+type Validate interface {
 	Read(ctx context.Context, inputURL string)
 	SetLogLevel(ctx context.Context, logLevelName string) error
 }
@@ -16,7 +16,7 @@ type Initializer interface {
 // ----------------------------------------------------------------------------
 
 // Identfier of the  package found messages having the format "senzing-6203xxxx".
-const ComponentId = 6203
+const ComponentID = 6203
 
 // Log message prefix.
 const Prefix = "validate: "

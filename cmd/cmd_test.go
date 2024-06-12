@@ -5,12 +5,14 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 /*
  * The unit tests in this file simulate command line invocation.
  */
-func Test_ExecuteCommand_NoInputURL(t *testing.T) {
+func Test_ExecuteCommand_NoInputURL(test *testing.T) {
 	cmd := RootCmd
 	outbuf := bytes.NewBufferString("")
 	errbuf := bytes.NewBufferString("")
@@ -19,32 +21,33 @@ func Test_ExecuteCommand_NoInputURL(t *testing.T) {
 	cmd.SetArgs([]string{"--input-url", "none"})
 	exError := RootCmd.Execute()
 	if exError == nil {
-		t.Fatalf("expected Execute() to generated an error")
+		test.Fatalf("expected Execute() to generated an error")
 	}
 	stderr, err := io.ReadAll(errbuf)
 	if err != nil {
-		t.Fatal(err)
+		test.Fatal(err)
 	}
 	if !strings.Contains(string(stderr), "validation failed") {
-		t.Fatalf("expected input-url parameter error")
+		test.Fatalf("expected input-url parameter error")
 	}
 }
 
-func Test_ExecuteCommand_Help(t *testing.T) {
+func Test_ExecuteCommand_Help(test *testing.T) {
 	cmd := RootCmd
 	outbuf := bytes.NewBufferString("")
 	errbuf := bytes.NewBufferString("")
 	cmd.SetOut(outbuf)
 	cmd.SetErr(errbuf)
 	cmd.SetArgs([]string{"--help"})
-	RootCmd.Execute()
+	err := RootCmd.Execute()
+	require.NoError(test, err)
 
 	stdout, err := io.ReadAll(outbuf)
 	if err != nil {
-		t.Fatal(err)
+		test.Fatal(err)
 	}
 	// fmt.Println("stdout:", string(stdout))
 	if !strings.Contains(string(stdout), "Available Commands") {
-		t.Fatalf("expected help text")
+		test.Fatalf("expected help text")
 	}
 }

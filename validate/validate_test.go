@@ -15,6 +15,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -32,7 +33,7 @@ func TestValidateImpl_Read(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
@@ -59,7 +60,7 @@ func TestValidateImpl_Read_with_bad_records(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
@@ -87,7 +88,7 @@ func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 		LogLevel: "BAD",
 	}
@@ -112,7 +113,7 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "BAD",
 	}
 	result := validator.Read(context.Background())
@@ -136,7 +137,7 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "http://bad:bad{BAD=bad@example.com",
 	}
 	result := validator.Read(context.Background())
@@ -160,7 +161,7 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "BAD,Really bad",
 	}
 	result := validator.Read(context.Background())
@@ -184,7 +185,7 @@ func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "file:///badfile.jsonl",
 	}
 	result := validator.Read(context.Background())
@@ -224,7 +225,7 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.Read(context.Background())
 
 	w.Close()
@@ -249,7 +250,7 @@ func TestValidateImpl_Read_bad_file_type(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
@@ -276,7 +277,7 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputFileType: "JSONL",
 		InputURL:      fmt.Sprintf("file://%s", filename),
 	}
@@ -308,7 +309,7 @@ func TestValidateImpl_Read_gz(t *testing.T) {
 	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
@@ -335,7 +336,7 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.Read(context.Background())
@@ -372,7 +373,7 @@ func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 	}()
 
 	idx := strings.LastIndex(filename, "/")
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
@@ -409,7 +410,7 @@ func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 	}()
 
 	idx := strings.LastIndex(filename, "/")
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
@@ -445,7 +446,7 @@ func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:4444444/%s", "bad.jsonl"),
 	}
 	result := validator.Read(context.Background())
@@ -482,7 +483,7 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 	}()
 
 	idx := strings.LastIndex(filename, "/")
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
@@ -518,7 +519,7 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:44444444/%s", "bad.gz"),
 	}
 	result := validator.Read(context.Background())
@@ -555,7 +556,7 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 	}()
 
 	idx := strings.LastIndex(filename, "/")
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("http://localhost:%d/%s", port, filename[(idx+1):]),
 	}
 	result := validator.Read(context.Background())
@@ -590,9 +591,9 @@ func TestValidateImpl_Read_jsonOutput(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL:   fmt.Sprintf("file://%s", filename),
-		JsonOutput: true,
+		JSONOutput: true,
 	}
 	result := validator.Read(context.Background())
 
@@ -619,9 +620,9 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL:   fmt.Sprintf("file://%s", filename),
-		JsonOutput: true,
+		JSONOutput: true,
 	}
 	result := validator.Read(context.Background())
 
@@ -651,7 +652,7 @@ func TestValidateImpl_readJsonlFile(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readJSONLFile(filename)
@@ -679,7 +680,7 @@ func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readJSONLFile(filename)
@@ -706,9 +707,9 @@ func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL:   fmt.Sprintf("file://%s", filename),
-		JsonOutput: true,
+		JSONOutput: true,
 	}
 	result := validator.readJSONLFile(filename)
 
@@ -734,9 +735,9 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL:   fmt.Sprintf("file://%s", filename),
-		JsonOutput: true,
+		JSONOutput: true,
 	}
 	result := validator.readJSONLFile(filename)
 
@@ -766,7 +767,7 @@ func TestValidateImpl_readGzipFile(t *testing.T) {
 	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readGZIPFile(filename)
@@ -793,7 +794,7 @@ func TestValidateImpl_readGzipFile_bad(t *testing.T) {
 	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readGZIPFile(filename)
@@ -819,7 +820,7 @@ func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
 
 	filename := "/bad.gz"
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readGZIPFile(filename)
@@ -846,7 +847,7 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 	filename, moreCleanUp := createTempDataFile(t, testBadData, "gz")
 	defer moreCleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: fmt.Sprintf("file://%s", filename),
 	}
 	result := validator.readGZIPFile(filename)
@@ -892,7 +893,7 @@ func TestValidateImpl_readStdin(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.readStdin()
 
 	w.Close()
@@ -930,7 +931,7 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.readStdin()
 
 	w.Close()
@@ -956,7 +957,7 @@ func TestValidateImpl_validateLines(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	validator.validateLines(strings.NewReader(testGoodData))
 
 	w.Close()
@@ -975,7 +976,7 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	validator.validateLines(strings.NewReader(testBadData))
 
 	w.Close()
@@ -992,8 +993,8 @@ func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
-		JsonOutput: true,
+	validator := &BasicValidate{
+		JSONOutput: true,
 	}
 	validator.validateLines(strings.NewReader(testGoodData))
 
@@ -1013,8 +1014,8 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
-		JsonOutput: true,
+	validator := &BasicValidate{
+		JSONOutput: true,
 	}
 	validator.validateLines(strings.NewReader(testBadData))
 
@@ -1081,7 +1082,7 @@ func createTempGZIPDataFile(t *testing.T, content string) (filename string, clea
 // serve the requested resource on a random port
 func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, int) {
 	t.Helper()
-	listener, err := net.Listen("tcp", ":0")
+	listener, err := net.Listen("tcp", ":0") // #nosec:G102
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1089,8 +1090,9 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 	idx := strings.LastIndex(filename, string(os.PathSeparator))
 	fs := http.FileServer(http.Dir(filename[:idx]))
 	server := http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: fs,
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           fs,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 	return &server, &listener, port
 
@@ -1110,7 +1112,7 @@ func mockStdout(t *testing.T) (reader *os.File, writer *os.File, cleanUp func())
 	return reader,
 		writer,
 		func() {
-			//clean-up
+			// clean-up
 			os.Stdout = origStdout
 		}
 }
@@ -1128,12 +1130,12 @@ func mockStderr(t *testing.T) (reader *os.File, writer *os.File, cleanUp func())
 	return reader,
 		writer,
 		func() {
-			//clean-up
+			// clean-up
 			os.Stderr = origStderr
 		}
 }
 
-var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
+var testGoodData = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000002", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "SUITE E-2,UNION COURT BUILDING, P.O. BOX N-8188, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000002"}
 {"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000003", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "LYFORD CAY HOUSE, LYFORD CAY, P.O. BOX N-7785, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000003"}
 {"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000004", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "P.O. BOX N-3708 BAHAMAS FINANCIAL CENTRE, P.O. BOX N-3708 SHIRLEY & CHARLOTTE STS, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000004"}
@@ -1146,7 +1148,7 @@ var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENT
 {"SOCIAL_HANDLE": "shuddersv", "DATE_OF_BIRTH": "16/7/1974", "ADDR_STATE": "NC", "ADDR_POSTAL_CODE": "257609", "ENTITY_TYPE": "TEST", "GENDER": "F", "srccode": "MDMPER", "RECORD_ID": "151110080", "DSRC_ACTION": "A", "ADDR_CITY": "Raleigh", "DRIVERS_LICENSE_NUMBER": "95", "PHONE_NUMBER": "984-881-8384", "NAME_LAST": "OBERMOELLER", "entityid": "151110080", "ADDR_LINE1": "3802 eBllevue RD", "DATA_SOURCE": "TEST"}
 {"SOCIAL_HANDLE": "battlesa", "ADDR_STATE": "LA", "ADDR_POSTAL_CODE": "70706", "NAME_FIRST": "DEVIN", "ENTITY_TYPE": "TEST", "GENDER": "M", "srccode": "MDMPER", "CC_ACCOUNT_NUMBER": "5018608175414044187", "RECORD_ID": "151267101", "DSRC_ACTION": "A", "ADDR_CITY": "Denham Springs", "DRIVERS_LICENSE_NUMBER": "614557601", "PHONE_NUMBER": "318-398-0649", "NAME_LAST": "LOVELL", "entityid": "151267101", "ADDR_LINE1": "8487 Ashley ", "DATA_SOURCE": "TEST"}
 `
-var testBadData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
+var testBadData = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"DATA_SOURCE": "ICIJ", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000002", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "SUITE E-2,UNION COURT BUILDING, P.O. BOX N-8188, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000002"}
