@@ -111,7 +111,7 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "BAD",
 	}
 	result := validator.Read(context.Background())
@@ -135,7 +135,7 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "http://bad:bad{BAD=bad@example.com",
 	}
 	result := validator.Read(context.Background())
@@ -159,7 +159,7 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
+	validator := &BasicValidate{
 		InputURL: "BAD,Really bad",
 	}
 	result := validator.Read(context.Background())
@@ -223,7 +223,7 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.Read(context.Background())
 
 	w.Close()
@@ -891,7 +891,7 @@ func TestValidateImpl_readStdin(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.readStdin()
 
 	w.Close()
@@ -900,10 +900,10 @@ func TestValidateImpl_readStdin(t *testing.T) {
 
 	want := "Fatal error stdin not piped"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+		t.Errorf("BasicValidate.readStdin() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+		t.Errorf("BasicValidate.readStdin() = %v, want false", result)
 	}
 }
 func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
@@ -929,7 +929,7 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 		}
 	}()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	result := validator.readStdin()
 
 	w.Close()
@@ -938,10 +938,10 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
 	want := "Fatal error stdin not piped"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+		t.Errorf("BasicValidate.readStdin() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+		t.Errorf("BasicValidate.readStdin() = %v, want false", result)
 	}
 }
 
@@ -955,7 +955,7 @@ func TestValidateImpl_validateLines(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	validator.validateLines(strings.NewReader(testGoodData))
 
 	w.Close()
@@ -964,7 +964,7 @@ func TestValidateImpl_validateLines(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.validateLines() = %v, want %v", got, want)
+		t.Errorf("BasicValidate.validateLines() = %v, want %v", got, want)
 	}
 }
 
@@ -974,7 +974,7 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{}
+	validator := &BasicValidate{}
 	validator.validateLines(strings.NewReader(testBadData))
 
 	w.Close()
@@ -991,8 +991,8 @@ func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
-		JsonOutput: true,
+	validator := &BasicValidate{
+		JSONOutput: true,
 	}
 	validator.validateLines(strings.NewReader(testGoodData))
 
@@ -1002,7 +1002,7 @@ func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		t.Errorf("BasicValidate.Read() = %v, want %v", got, want)
 	}
 }
 
@@ -1012,8 +1012,8 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 	r, w, cleanUp := mockStderr(t)
 	defer cleanUp()
 
-	validator := &ValidateImpl{
-		JsonOutput: true,
+	validator := &BasicValidate{
+		JSONOutput: true,
 	}
 	validator.validateLines(strings.NewReader(testBadData))
 
@@ -1023,7 +1023,7 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		t.Errorf("BasicValidate.Read() = %v, want %v", got, want)
 	}
 }
 

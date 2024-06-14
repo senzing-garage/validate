@@ -32,7 +32,7 @@ type BasicValidate struct {
 // Public methods
 // ----------------------------------------------------------------------------
 
-// using the information in the ValidateImpl object read and validate that
+// using the information in the BasicValidate object read and validate that
 // the records are valid
 func (validate *BasicValidate) Read(ctx context.Context) bool {
 

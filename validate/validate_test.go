@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // ----------------------------------------------------------------------------
@@ -25,12 +26,12 @@ import (
 // ----------------------------------------------------------------------------
 
 // read jsonl file successfully, no record validation errors
-func TestValidateImpl_Read(t *testing.T) {
+func TestValidateImpl_Read(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -44,20 +45,20 @@ func TestValidateImpl_Read(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
 // read jsonl file successully, but with record validation errors
-func TestValidateImpl_Read_with_bad_records(t *testing.T) {
+func TestValidateImpl_Read_with_bad_records(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -71,21 +72,21 @@ func TestValidateImpl_Read_with_bad_records(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) && result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
 // read jsonl file successfully, but attept to set a bad log level
 // falls back to INFO
-func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
+func TestValidateImpl_Read_bad_loglevel(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -100,17 +101,17 @@ func TestValidateImpl_Read_bad_loglevel(t *testing.T) {
 
 	want := "Unable to set log level to BAD"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
 // attempt to read a jsonl file, but the input url is bad
-func TestValidateImpl_Read_bad_url(t *testing.T) {
+func TestValidateImpl_Read_bad_url(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -124,17 +125,17 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 
 	want := "Fatal error, Check the input-url parameter: BAD"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
 // attempt to read a jsonl file, but the input url isn't parsable
-func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
+func TestValidateImpl_Read_bad_url_parse(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -148,17 +149,17 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 
 	want := "Fatal error parsing input-url"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
 // attempt to read a jsonl file, but the input url is not understood
-func TestValidateImpl_Read_url_drop_through(t *testing.T) {
+func TestValidateImpl_Read_url_drop_through(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -172,17 +173,17 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 
 	want := "Fatal error unable to handle"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
 // attempt to read a jsonl file, but the file doesn't exist
-func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
+func TestValidateImpl_Read_file_doesnt_exist(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -196,19 +197,19 @@ func TestValidateImpl_Read_file_doesnt_exist(t *testing.T) {
 
 	want := "Fatal error opening input file: /badfile.jsonl"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
-func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
+func TestValidateImpl_Read_stdin_unpipe_error(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
@@ -216,12 +217,12 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		t.Fatal(err)
+		test.Fatal(err)
 	}
 	os.Stdin = file
 	defer func() {
 		if err := file.Close(); err != nil {
-			t.Fatal(err)
+			test.Fatal(err)
 		}
 	}()
 
@@ -234,20 +235,20 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 
 	want := "Fatal error stdin not piped"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
 // attempt to read a file, but it has a file type that is not known
-func TestValidateImpl_Read_bad_file_type(t *testing.T) {
+func TestValidateImpl_Read_bad_file_type(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "txt")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -261,20 +262,20 @@ func TestValidateImpl_Read_bad_file_type(t *testing.T) {
 
 	want := "If this is a valid JSONL file, please rename with the .jsonl extension or use the file type override (--file-type)"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 }
 
 // attempt to read a file type that is not known, but override with input file type
-func TestValidateImpl_Read_override_file_type(t *testing.T) {
+func TestValidateImpl_Read_override_file_type(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "txt")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "txt")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -289,10 +290,10 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
@@ -301,12 +302,12 @@ func TestValidateImpl_Read_override_file_type(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a gz file successfully, with no record validation errors
-func TestValidateImpl_Read_gz(t *testing.T) {
+func TestValidateImpl_Read_gz(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
+	filename, moreCleanUp := createTempGZIPDataFile(test, testGoodData)
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -320,20 +321,20 @@ func TestValidateImpl_Read_gz(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
 // read a gz file successfully, but with record validation errors
-func TestValidateImpl_Read_gz_bad(t *testing.T) {
+func TestValidateImpl_Read_gz_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
+	filename, moreCleanUp := createTempGZIPDataFile(test, testBadData)
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -347,10 +348,10 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
@@ -358,14 +359,14 @@ func TestValidateImpl_Read_gz_bad(t *testing.T) {
 // test Read resources
 // ----------------------------------------------------------------------------
 
-func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
+func TestValidateImpl_Read_resource_jsonl(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
+	filename, cleanUpTempFile := createTempDataFile(test, testGoodData, "jsonl")
 	defer cleanUpTempFile()
-	server, listener, port := serveResource(t, filename)
+	server, listener, port := serveResource(test, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -384,25 +385,25 @@ func TestValidateImpl_Read_resource_jsonl(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		test.Error(err)
 	}
 }
 
-func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
+func TestValidateImpl_Read_resource_unknown_extension(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "bad")
+	filename, cleanUpTempFile := createTempDataFile(test, testGoodData, "bad")
 	defer cleanUpTempFile()
-	server, listener, port := serveResource(t, filename)
+	server, listener, port := serveResource(test, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -421,25 +422,25 @@ func TestValidateImpl_Read_resource_unknown_extension(t *testing.T) {
 
 	want := "If this is a valid JSONL resource"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		test.Error(err)
 	}
 }
 
-func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
+func TestValidateImpl_Read_resource_bad_url(tes *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(tes)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "jsonl")
+	filename, cleanUpTempFile := createTempDataFile(tes, testGoodData, "jsonl")
 	defer cleanUpTempFile()
-	server, listener, _ := serveResource(t, filename)
+	server, listener, _ := serveResource(tes, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -457,25 +458,25 @@ func TestValidateImpl_Read_resource_bad_url(t *testing.T) {
 
 	want := "Fatal error retrieving input-url"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		tes.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		tes.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		tes.Error(err)
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip(t *testing.T) {
+func TestValidateImpl_Read_resource_gzip(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
+	filename, cleanUpTempFile := createTempGZIPDataFile(test, testGoodData)
 	defer cleanUpTempFile()
-	server, listener, port := serveResource(t, filename)
+	server, listener, port := serveResource(test, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -494,25 +495,25 @@ func TestValidateImpl_Read_resource_gzip(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		test.Error(err)
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
+func TestValidateImpl_Read_resource_gzip_bad_url(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempGZIPDataFile(t, testGoodData)
+	filename, cleanUpTempFile := createTempGZIPDataFile(test, testGoodData)
 	defer cleanUpTempFile()
-	server, listener, _ := serveResource(t, filename)
+	server, listener, _ := serveResource(test, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -530,25 +531,25 @@ func TestValidateImpl_Read_resource_gzip_bad_url(t *testing.T) {
 
 	want := "Fatal error retrieving GZIPped input-url"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.Read() = %v, want false", result)
+		test.Errorf("ValidateImpl.Read() = %v, want false", result)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		test.Error(err)
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
+func TestValidateImpl_Read_resource_gzip_not_gzipped(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, cleanUpTempFile := createTempDataFile(t, testGoodData, "gz")
+	filename, cleanUpTempFile := createTempDataFile(test, testGoodData, "gz")
 	defer cleanUpTempFile()
-	server, listener, port := serveResource(t, filename)
+	server, listener, port := serveResource(test, filename)
 	go func() {
 		if err := server.Serve(*listener); err != http.ErrServerClosed {
 			log.Fatalf("server.Serve(): %v", err)
@@ -567,14 +568,14 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 
 	want := "Fatal error reading GZIPped input-url"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", result, false)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", result, false)
 	}
 
 	if err := server.Shutdown(context.Background()); err != nil {
-		t.Error(err)
+		test.Error(err)
 	}
 }
 
@@ -583,17 +584,18 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_Read_jsonOutput(t *testing.T) {
+func TestValidateImpl_Read_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
 		InputURL:   fmt.Sprintf("file://%s", filename),
 		JSONOutput: true,
+		LogLevel:   "WARN",
 	}
 	result := validator.Read(context.Background())
 
@@ -603,21 +605,21 @@ func TestValidateImpl_Read_jsonOutput(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
+func TestValidateImpl_Read_jsonOutput_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -632,10 +634,10 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
@@ -644,12 +646,12 @@ func TestValidateImpl_Read_jsonOutput_bad(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_readJsonlFile(t *testing.T) {
+func TestValidateImpl_readJsonlFile(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -663,21 +665,21 @@ func TestValidateImpl_readJsonlFile(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
+		test.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
 	}
 
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
+func TestValidateImpl_readJsonlFile_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -691,20 +693,20 @@ func TestValidateImpl_readJsonlFile_bad(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readJSONLFile() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
+		test.Errorf("ValidateImpl.readJSONLFile() = %v, want true", result)
 	}
 }
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
+func TestValidateImpl_readJsonlFile_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -719,20 +721,20 @@ func TestValidateImpl_readJsonlFile_jsonOutput(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
+func TestValidateImpl_readJsonlFile_jsonOutput_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -747,10 +749,10 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.Read() = %v, want true", result)
+		test.Errorf("ValidateImpl.Read() = %v, want true", result)
 	}
 }
 
@@ -759,12 +761,12 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a gzip file successfully, no record validation errors
-func TestValidateImpl_readGzipFile(t *testing.T) {
+func TestValidateImpl_readGzipFile(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGZIPDataFile(t, testGoodData)
+	filename, moreCleanUp := createTempGZIPDataFile(test, testGoodData)
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -778,20 +780,20 @@ func TestValidateImpl_readGzipFile(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
 	}
 }
 
 // read a gzip file successfully, but with record validation errors
-func TestValidateImpl_readGzipFile_bad(t *testing.T) {
+func TestValidateImpl_readGzipFile_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempGZIPDataFile(t, testBadData)
+	filename, moreCleanUp := createTempGZIPDataFile(test, testBadData)
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -805,17 +807,17 @@ func TestValidateImpl_readGzipFile_bad(t *testing.T) {
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
 	}
 	if result != true {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want true", result)
 	}
 }
 
 // attempt to read a gzip file that doesn't exist
-func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
+func TestValidateImpl_readGzipFile_file_does_not_exist(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	filename := "/bad.gz"
@@ -831,20 +833,20 @@ func TestValidateImpl_readGzipFile_file_does_not_exist(t *testing.T) {
 
 	want := "no such file or directory"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
 	}
 }
 
 // attempt to read a gzip file that isn't a gzip file
-func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
+func TestValidateImpl_readGzipFile_not_a_gzip_file(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testBadData, "gz")
+	filename, moreCleanUp := createTempDataFile(test, testBadData, "gz")
 	defer moreCleanUp()
 
 	validator := &BasicValidate{
@@ -858,10 +860,10 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 
 	want := "invalid header"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
+		test.Errorf("ValidateImpl.readGZIPFile() = %v, want false", result)
 	}
 }
 
@@ -869,12 +871,12 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(t *testing.T) {
 // test read stdin
 // ----------------------------------------------------------------------------
 
-func TestValidateImpl_readStdin(t *testing.T) {
+func TestValidateImpl_readStdin(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
@@ -882,14 +884,14 @@ func TestValidateImpl_readStdin(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		t.Fatal(err)
+		test.Fatal(err)
 	}
 
 	os.Stdin = file
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			t.Fatal(err)
+			test.Fatal(err)
 		}
 	}()
 
@@ -902,18 +904,18 @@ func TestValidateImpl_readStdin(t *testing.T) {
 
 	want := "Fatal error stdin not piped"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+		test.Errorf("ValidateImpl.readStdin() = %v, want false", result)
 	}
 }
-func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
+func TestValidateImpl_readStdin_unpipe_error(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(t, testGoodData, "jsonl")
+	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
@@ -921,13 +923,13 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		t.Fatal(err)
+		test.Fatal(err)
 	}
 	os.Stdin = file
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			t.Fatal(err)
+			test.Fatal(err)
 		}
 	}()
 
@@ -940,10 +942,10 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
 	want := "Fatal error stdin not piped"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.readStdin() = %v, want %v", got, want)
 	}
 	if result == true {
-		t.Errorf("ValidateImpl.readStdin() = %v, want false", result)
+		test.Errorf("ValidateImpl.readStdin() = %v, want false", result)
 	}
 }
 
@@ -952,9 +954,9 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 // validate lines with no record validation errors
-func TestValidateImpl_validateLines(t *testing.T) {
+func TestValidateImpl_validateLines(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{}
@@ -966,14 +968,14 @@ func TestValidateImpl_validateLines(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.validateLines() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.validateLines() = %v, want %v", got, want)
 	}
 }
 
 // validate lines, but with record validation errors
-func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
+func TestValidateImpl_validateLines_with_validation_errors(test *testing.T) {
 
-	r, w, cleanUp := mockStdout(t)
+	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{}
@@ -984,13 +986,13 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 	got := string(out)
 
 	msg := "Validated 16 lines, 4 were bad"
-	assert.Contains(t, got, msg)
+	assert.Contains(test, got, msg)
 }
 
 // validate lines with no record validation errors, json output
-func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
+func TestValidateImpl_validateLines_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -1004,14 +1006,14 @@ func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 
 	want := "Validated 12 lines, 0 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 }
 
 // validate lines, but with record validation errors and json output
-func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing.T) {
+func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
+	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
 
 	validator := &BasicValidate{
@@ -1025,7 +1027,7 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 
 	want := "Validated 16 lines, 4 were bad"
 	if !strings.Contains(got, want) {
-		t.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
 	}
 }
 
@@ -1034,58 +1036,51 @@ func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing
 // ----------------------------------------------------------------------------
 
 // create a tempdata file with the given content and extension
-func createTempDataFile(t *testing.T, content string, fileextension string) (filename string, cleanUp func()) {
-	t.Helper()
-	tmpfile, err := os.CreateTemp(t.TempDir(), "test.*."+fileextension)
-	if err != nil {
-		t.Fatal(err)
-	}
+func createTempDataFile(test *testing.T, content string, fileextension string) (filename string, cleanUp func()) {
+	test.Helper()
+	tmpfile, err := os.CreateTemp(test.TempDir(), "test.*."+fileextension)
+	require.NoError(test, err)
 
-	if _, err := tmpfile.WriteString(content); err != nil {
-		t.Fatal(err)
-	}
+	_, err = tmpfile.WriteString(content)
+	require.NoError(test, err)
 
 	filename = tmpfile.Name()
 
-	if err := tmpfile.Close(); err != nil {
-		t.Fatal(err)
-	}
+	err = tmpfile.Close()
+	require.NoError(test, err)
+
 	return filename,
 		func() {
-			os.Remove(filename)
+			err := os.Remove(filename)
+			require.NoError(test, err)
 		}
 }
 
 // create a temp gzipped datafile with the given content
-func createTempGZIPDataFile(t *testing.T, content string) (filename string, cleanUp func()) {
-	t.Helper()
-
+func createTempGZIPDataFile(test *testing.T, content string) (filename string, cleanUp func()) {
+	test.Helper()
 	tmpfile, err := os.CreateTemp("", "test.*.jsonl.gz")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(test, err)
 	defer tmpfile.Close()
 	gf := gzip.NewWriter(tmpfile)
 	defer gf.Close()
 	fw := bufio.NewWriter(gf)
-	if _, err := fw.WriteString(content); err != nil {
-		t.Fatal(err)
-	}
+	_, err = fw.WriteString(content)
+	require.NoError(test, err)
 	fw.Flush()
 	filename = tmpfile.Name()
 	return filename,
 		func() {
-			os.Remove(filename)
+			err := os.Remove(filename)
+			require.NoError(test, err)
 		}
 }
 
 // serve the requested resource on a random port
-func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, int) {
-	t.Helper()
+func serveResource(test *testing.T, filename string) (*http.Server, *net.Listener, int) {
+	test.Helper()
 	listener, err := net.Listen("tcp", ":0") // #nosec:G102
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(test, err)
 	port := listener.Addr().(*net.TCPAddr).Port
 	idx := strings.LastIndex(filename, string(os.PathSeparator))
 	fs := http.FileServer(http.Dir(filename[:idx]))
@@ -1099,14 +1094,12 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 }
 
 // capture stdout for testing
-func mockStdout(t *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
-	t.Helper()
+func mockStdout(test *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
+	test.Helper()
 
 	origStdout := os.Stdout
 	reader, writer, err := os.Pipe()
-	if err != nil {
-		assert.Fail(t, "couldn't get os Pipe: %v", err)
-	}
+	require.NoErrorf(test, err, "couldn't get os Pipe: %v", err)
 	os.Stdout = writer
 
 	return reader,
@@ -1118,12 +1111,12 @@ func mockStdout(t *testing.T) (reader *os.File, writer *os.File, cleanUp func())
 }
 
 // capture stderr for testing
-func mockStderr(t *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
-	t.Helper()
+func mockStderr(test *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
+	test.Helper()
 	origStderr := os.Stderr
 	reader, writer, err := os.Pipe()
 	if err != nil {
-		assert.Fail(t, "couldn't get os Pipe: %v", err)
+		assert.Fail(test, "couldn't get os Pipe: %v", err)
 	}
 	os.Stderr = writer
 
