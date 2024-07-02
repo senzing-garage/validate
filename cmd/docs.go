@@ -16,7 +16,6 @@ var docsCmd = &cobra.Command{
 	Use:   "docs",
 	Short: "Generate documentation for the command",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_ = cmd
 		_ = args
 		dir, err := cmd.Flags().GetString("dir")
 		if err != nil {

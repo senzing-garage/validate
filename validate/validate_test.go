@@ -26,7 +26,7 @@ import (
 // ----------------------------------------------------------------------------
 
 // read jsonl file successfully, no record validation errors
-func TestValidateImpl_Read(test *testing.T) {
+func TestBasicValidate_Read(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -53,7 +53,7 @@ func TestValidateImpl_Read(test *testing.T) {
 }
 
 // read jsonl file successully, but with record validation errors
-func TestValidateImpl_Read_with_bad_records(test *testing.T) {
+func TestBasicValidate_Read_with_bad_records(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -81,7 +81,7 @@ func TestValidateImpl_Read_with_bad_records(test *testing.T) {
 
 // read jsonl file successfully, but attept to set a bad log level
 // falls back to INFO
-func TestValidateImpl_Read_bad_loglevel(test *testing.T) {
+func TestBasicValidate_Read_bad_loglevel(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -109,7 +109,7 @@ func TestValidateImpl_Read_bad_loglevel(test *testing.T) {
 }
 
 // attempt to read a jsonl file, but the input url is bad
-func TestValidateImpl_Read_bad_url(test *testing.T) {
+func TestBasicValidate_Read_bad_url(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -133,7 +133,7 @@ func TestValidateImpl_Read_bad_url(test *testing.T) {
 }
 
 // attempt to read a jsonl file, but the input url isn't parsable
-func TestValidateImpl_Read_bad_url_parse(test *testing.T) {
+func TestBasicValidate_Read_bad_url_parse(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -157,7 +157,7 @@ func TestValidateImpl_Read_bad_url_parse(test *testing.T) {
 }
 
 // attempt to read a jsonl file, but the input url is not understood
-func TestValidateImpl_Read_url_drop_through(test *testing.T) {
+func TestBasicValidate_Read_url_drop_through(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -181,7 +181,7 @@ func TestValidateImpl_Read_url_drop_through(test *testing.T) {
 }
 
 // attempt to read a jsonl file, but the file doesn't exist
-func TestValidateImpl_Read_file_doesnt_exist(test *testing.T) {
+func TestBasicValidate_Read_file_doesnt_exist(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -204,7 +204,7 @@ func TestValidateImpl_Read_file_doesnt_exist(test *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_stdin_unpipe_error(test *testing.T) {
+func TestBasicValidate_Read_stdin_unpipe_error(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -243,7 +243,7 @@ func TestValidateImpl_Read_stdin_unpipe_error(test *testing.T) {
 }
 
 // attempt to read a file, but it has a file type that is not known
-func TestValidateImpl_Read_bad_file_type(test *testing.T) {
+func TestBasicValidate_Read_bad_file_type(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -270,7 +270,7 @@ func TestValidateImpl_Read_bad_file_type(test *testing.T) {
 }
 
 // attempt to read a file type that is not known, but override with input file type
-func TestValidateImpl_Read_override_file_type(test *testing.T) {
+func TestBasicValidate_Read_override_file_type(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -302,7 +302,7 @@ func TestValidateImpl_Read_override_file_type(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a gz file successfully, with no record validation errors
-func TestValidateImpl_Read_gz(test *testing.T) {
+func TestBasicValidate_Read_gz(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -329,7 +329,7 @@ func TestValidateImpl_Read_gz(test *testing.T) {
 }
 
 // read a gz file successfully, but with record validation errors
-func TestValidateImpl_Read_gz_bad(test *testing.T) {
+func TestBasicValidate_Read_gz_bad(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -359,7 +359,7 @@ func TestValidateImpl_Read_gz_bad(test *testing.T) {
 // test Read resources
 // ----------------------------------------------------------------------------
 
-func TestValidateImpl_Read_resource_jsonl(test *testing.T) {
+func TestBasicValidate_Read_resource_jsonl(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -396,7 +396,7 @@ func TestValidateImpl_Read_resource_jsonl(test *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_resource_unknown_extension(test *testing.T) {
+func TestBasicValidate_Read_resource_unknown_extension(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -433,7 +433,7 @@ func TestValidateImpl_Read_resource_unknown_extension(test *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_resource_bad_url(tes *testing.T) {
+func TestBasicValidate_Read_resource_bad_url(tes *testing.T) {
 
 	r, w, cleanUp := mockStdout(tes)
 	defer cleanUp()
@@ -469,7 +469,7 @@ func TestValidateImpl_Read_resource_bad_url(tes *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip(test *testing.T) {
+func TestBasicValidate_Read_resource_gzip(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -506,7 +506,7 @@ func TestValidateImpl_Read_resource_gzip(test *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip_bad_url(test *testing.T) {
+func TestBasicValidate_Read_resource_gzip_bad_url(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -542,7 +542,7 @@ func TestValidateImpl_Read_resource_gzip_bad_url(test *testing.T) {
 	}
 }
 
-func TestValidateImpl_Read_resource_gzip_not_gzipped(test *testing.T) {
+func TestBasicValidate_Read_resource_gzip_not_gzipped(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -584,7 +584,7 @@ func TestValidateImpl_Read_resource_gzip_not_gzipped(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_Read_jsonOutput(test *testing.T) {
+func TestBasicValidate_Read_jsonOutput(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
@@ -614,7 +614,7 @@ func TestValidateImpl_Read_jsonOutput(test *testing.T) {
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_Read_jsonOutput_bad(test *testing.T) {
+func TestBasicValidate_Read_jsonOutput_bad(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
@@ -646,7 +646,7 @@ func TestValidateImpl_Read_jsonOutput_bad(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_readJsonlFile(test *testing.T) {
+func TestBasicValidate_readJsonlFile(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -674,7 +674,7 @@ func TestValidateImpl_readJsonlFile(test *testing.T) {
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_readJsonlFile_bad(test *testing.T) {
+func TestBasicValidate_readJsonlFile_bad(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -701,7 +701,7 @@ func TestValidateImpl_readJsonlFile_bad(test *testing.T) {
 }
 
 // read a json file successfully, with no record validation errors
-func TestValidateImpl_readJsonlFile_jsonOutput(test *testing.T) {
+func TestBasicValidate_readJsonlFile_jsonOutput(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
@@ -729,7 +729,7 @@ func TestValidateImpl_readJsonlFile_jsonOutput(test *testing.T) {
 }
 
 // read a json file successfully, but with record validation errors
-func TestValidateImpl_readJsonlFile_jsonOutput_bad(test *testing.T) {
+func TestBasicValidate_readJsonlFile_jsonOutput_bad(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
@@ -761,7 +761,7 @@ func TestValidateImpl_readJsonlFile_jsonOutput_bad(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a gzip file successfully, no record validation errors
-func TestValidateImpl_readGzipFile(test *testing.T) {
+func TestBasicValidate_readGzipFile(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -788,7 +788,7 @@ func TestValidateImpl_readGzipFile(test *testing.T) {
 }
 
 // read a gzip file successfully, but with record validation errors
-func TestValidateImpl_readGzipFile_bad(test *testing.T) {
+func TestBasicValidate_readGzipFile_bad(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -815,7 +815,7 @@ func TestValidateImpl_readGzipFile_bad(test *testing.T) {
 }
 
 // attempt to read a gzip file that doesn't exist
-func TestValidateImpl_readGzipFile_file_does_not_exist(test *testing.T) {
+func TestBasicValidate_readGzipFile_file_does_not_exist(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -841,7 +841,7 @@ func TestValidateImpl_readGzipFile_file_does_not_exist(test *testing.T) {
 }
 
 // attempt to read a gzip file that isn't a gzip file
-func TestValidateImpl_readGzipFile_not_a_gzip_file(test *testing.T) {
+func TestBasicValidate_readGzipFile_not_a_gzip_file(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -871,7 +871,7 @@ func TestValidateImpl_readGzipFile_not_a_gzip_file(test *testing.T) {
 // test read stdin
 // ----------------------------------------------------------------------------
 
-func TestValidateImpl_readStdin(test *testing.T) {
+func TestBasicValidate_readStdin(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -910,7 +910,7 @@ func TestValidateImpl_readStdin(test *testing.T) {
 		test.Errorf("ValidateImpl.readStdin() = %v, want false", result)
 	}
 }
-func TestValidateImpl_readStdin_unpipe_error(test *testing.T) {
+func TestBasicValidate_readStdin_unpipe_error(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -954,7 +954,7 @@ func TestValidateImpl_readStdin_unpipe_error(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // validate lines with no record validation errors
-func TestValidateImpl_validateLines(test *testing.T) {
+func TestBasicValidate_validateLines(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -973,7 +973,7 @@ func TestValidateImpl_validateLines(test *testing.T) {
 }
 
 // validate lines, but with record validation errors
-func TestValidateImpl_validateLines_with_validation_errors(test *testing.T) {
+func TestBasicValidate_validateLines_with_validation_errors(test *testing.T) {
 
 	r, w, cleanUp := mockStdout(test)
 	defer cleanUp()
@@ -990,7 +990,7 @@ func TestValidateImpl_validateLines_with_validation_errors(test *testing.T) {
 }
 
 // validate lines with no record validation errors, json output
-func TestValidateImpl_validateLines_jsonOutput(test *testing.T) {
+func TestBasicValidate_validateLines_jsonOutput(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
@@ -1011,7 +1011,7 @@ func TestValidateImpl_validateLines_jsonOutput(test *testing.T) {
 }
 
 // validate lines, but with record validation errors and json output
-func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(test *testing.T) {
+func TestBasicValidate_validateLines_with_validation_errors_jsonOutput(test *testing.T) {
 
 	r, w, cleanUp := mockStderr(test)
 	defer cleanUp()
