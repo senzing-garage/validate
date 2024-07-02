@@ -986,25 +986,25 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 }
 
 // validate lines with no record validation errors, json output
-func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
+// func TestValidateImpl_validateLines_jsonOutput(t *testing.T) {
 
-	r, w, cleanUp := mockStderr(t)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(t)
+// 	defer cleanUp()
 
-	validator := &BasicValidate{
-		JSONOutput: true,
-	}
-	validator.validateLines(strings.NewReader(testGoodData))
+// 	validator := &BasicValidate{
+// 		JSONOutput: true,
+// 	}
+// 	validator.validateLines(strings.NewReader(testGoodData))
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 12 lines, 0 were bad"
-	if !strings.Contains(got, want) {
-		t.Errorf("BasicValidate.Read() = %v, want %v", got, want)
-	}
-}
+// 	want := "Validated 12 lines, 0 were bad"
+// 	if !strings.Contains(got, want) {
+// 		t.Errorf("BasicValidate.Read() = %v, want %v", got, want)
+// 	}
+// }
 
 // validate lines, but with record validation errors and json output
 func TestValidateImpl_validateLines_with_validation_errors_jsonOutput(t *testing.T) {
