@@ -20,6 +20,8 @@ To load completions automaticallon on login, add this line to your .bashrc file:
 source < (validate completion)
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		_ = cmd
+		_ = args
 		return completionAction(os.Stdout)
 	},
 }

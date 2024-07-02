@@ -20,11 +20,11 @@ import (
 // Types
 // ----------------------------------------------------------------------------
 
-type ValidateImpl struct {
+type BasicValidate struct {
 	InputFileType string
 	InputURL      string
-	JsonOutput    bool
-	logger        logging.LoggingInterface
+	JSONOutput    bool
+	logger        logging.Logging
 	LogLevel      string
 }
 
@@ -32,63 +32,66 @@ type ValidateImpl struct {
 // Public methods
 // ----------------------------------------------------------------------------
 
-// using the information in the ValidateImpl object read and validate that
+// using the information in the BasicValidate object read and validate that
 // the records are valid
-func (v *ValidateImpl) Read(ctx context.Context) bool {
+func (validate *BasicValidate) Read(ctx context.Context) bool {
 
 	// Initialize logging.
 
-	logLevel := v.LogLevel
+	logLevel := validate.LogLevel
 	if logLevel == "" {
 		logLevel = "INFO"
 	}
-	err := v.SetLogLevel(ctx, logLevel)
+	err := validate.SetLogLevel(ctx, logLevel)
 	if err != nil {
-		v.log(3009, logLevel, err)
+		validate.log(3009, logLevel, err)
 	}
 
-	inputURLLen := len(v.InputURL)
+	inputURLLen := len(validate.InputURL)
 
 	if inputURLLen == 0 {
-		//assume stdin
-		return v.readStdin()
+		// assume stdin
+		return validate.readStdin()
 	}
 
-	//This assumes the URL includes a schema and path so, minimally:
+	// This assumes the URL includes a schema and path so, minimally:
 	//  "s://p" where the schema is 's' and 'p' is the complete path
 	if inputURLLen < 5 {
-		v.log(5000, v.InputURL)
+		validate.log(5000, validate.InputURL)
 		return false
 	}
 
-	v.log(2200, v.InputURL)
-	u, err := url.Parse(v.InputURL)
+	validate.log(2200, validate.InputURL)
+	parsedURL, err := url.Parse(validate.InputURL)
 	if err != nil {
-		v.log(5001, err)
+		validate.log(5001, err)
 		return false
 	}
-	if u.Scheme == "file" {
-		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			v.log(2201)
-			return v.readJSONLFile(u.Path)
-		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			v.log(2203)
-			return v.readGZIPFile(u.Path)
-		} else {
-			v.log(5011)
+	switch {
+	case parsedURL.Scheme == "file":
+		switch {
+		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
+			validate.log(2201)
+			return validate.readJSONLFile(parsedURL.Path)
+		case strings.HasSuffix(parsedURL.Path, "gz"), strings.ToUpper(validate.InputFileType) == "GZ":
+			validate.log(2203)
+			return validate.readGZIPFile(parsedURL.Path)
+		default:
+			validate.log(5011)
 		}
-	} else if u.Scheme == "http" || u.Scheme == "https" {
-		if strings.HasSuffix(u.Path, "jsonl") || strings.ToUpper(v.InputFileType) == "JSONL" {
-			v.log(2204)
-			return v.readJSONLResource(v.InputURL)
-		} else if strings.HasSuffix(u.Path, "gz") || strings.ToUpper(v.InputFileType) == "GZ" {
-			v.log(2205)
-			return v.readGZIPResource(v.InputURL)
-		} else {
-			v.log(5012)
+	case parsedURL.Scheme == "http", parsedURL.Scheme == "https":
+		switch {
+		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
+			validate.log(2204)
+			return validate.readJSONLResource(validate.InputURL)
+		case strings.HasSuffix(parsedURL.Path, "gz"), strings.ToUpper(validate.InputFileType) == "GZ":
+			validate.log(2205)
+			return validate.readGZIPResource(validate.InputURL)
+		default:
+			validate.log(5012)
 		}
-	} else {
-		v.log(5002, u.Scheme)
+	default:
+		validate.log(5002, parsedURL.Scheme)
 	}
 	return false
 }
@@ -100,8 +103,9 @@ Input
   - ctx: A context to control lifecycle.
   - logLevel: The desired log level. TRACE, DEBUG, INFO, WARN, ERROR, FATAL or PANIC.
 */
-func (v *ValidateImpl) SetLogLevel(ctx context.Context, logLevelName string) error {
-	var err error = nil
+func (validate *BasicValidate) SetLogLevel(ctx context.Context, logLevelName string) error {
+	_ = ctx
+	var err error
 
 	// Verify value of logLevelName.
 
@@ -111,112 +115,115 @@ func (v *ValidateImpl) SetLogLevel(ctx context.Context, logLevelName string) err
 
 	// Set ValidateImpl log level.
 
-	err = v.getLogger().SetLogLevel(logLevelName)
+	err = validate.getLogger().SetLogLevel(logLevelName)
 	return err
 }
 
 // ----------------------------------------------------------------------------
 // Internal methods
+//  	response, err := http.Get(jsonURL) // #nosec:G107
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
 
 // opens and reads a JSONL resource
-func (v *ValidateImpl) readJSONLResource(jsonURL string) bool {
-	// #nosec G107
-	response, err := http.Get(jsonURL)
+func (validate *BasicValidate) readJSONLResource(jsonURL string) bool {
+
+	//nolint:noctx
+	response, err := http.Get(jsonURL) //nolint:gosec
 
 	if err != nil {
-		v.log(5003, jsonURL, err)
+		validate.log(5003, jsonURL, err)
 		return false
 	}
 	defer response.Body.Close()
-	v.validateLines(response.Body)
+	validate.validateLines(response.Body)
 	return true
 }
 
 // ----------------------------------------------------------------------------
 
 // opens and reads a JSONL file
-func (v *ValidateImpl) readJSONLFile(jsonFile string) bool {
+func (validate *BasicValidate) readJSONLFile(jsonFile string) bool {
 	jsonFile = filepath.Clean(jsonFile)
 	file, err := os.Open(jsonFile)
 	if err != nil {
-		v.log(5004, jsonFile, err)
+		validate.log(5004, jsonFile, err)
 		return false
 	}
 	defer file.Close()
-	v.validateLines(file)
+	validate.validateLines(file)
 	return true
 }
 
 // ----------------------------------------------------------------------------
 
 // opens and reads a JSONL that has been piped to stdin
-func (v *ValidateImpl) readStdin() bool {
+func (validate *BasicValidate) readStdin() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		v.log(5005, err)
+		validate.log(5005, err)
 		return false
 	}
 
 	if info.Mode()&os.ModeNamedPipe == os.ModeNamedPipe {
 
 		reader := bufio.NewReader(os.Stdin)
-		v.validateLines(reader)
+		validate.validateLines(reader)
 		return true
 	}
-	v.log(5006, err)
+	validate.log(5006, err)
 	return false
 }
 
 // ----------------------------------------------------------------------------
 
 // opens and reads a JSONL resource that has been GZIPped
-func (v *ValidateImpl) readGZIPResource(gzURL string) bool {
-	// #nosec G107
-	response, err := http.Get(gzURL)
+func (validate *BasicValidate) readGZIPResource(gzURL string) bool {
+	//nolint:noctx
+	response, err := http.Get(gzURL) //nolint:gosec
+
 	if err != nil {
-		v.log(5009, gzURL, err)
+		validate.log(5009, gzURL, err)
 		return false
 	}
 	defer response.Body.Close()
 	reader, err := gzip.NewReader(response.Body)
 	if err != nil {
-		v.log(5010, gzURL, err)
+		validate.log(5010, gzURL, err)
 		return false
 	}
 	defer reader.Close()
-	v.validateLines(reader)
+	validate.validateLines(reader)
 	return true
 }
 
 // ----------------------------------------------------------------------------
 
 // opens and reads a JSONL file that has been GZIPped
-func (v *ValidateImpl) readGZIPFile(gzFile string) bool {
+func (validate *BasicValidate) readGZIPFile(gzFile string) bool {
 	gzFile = filepath.Clean(gzFile)
 	gzipfile, err := os.Open(gzFile)
 	if err != nil {
-		v.log(5007, gzFile, err)
+		validate.log(5007, gzFile, err)
 		return false
 	}
 	defer gzipfile.Close()
 
 	reader, err := gzip.NewReader(gzipfile)
 	if err != nil {
-		v.log(5008, gzFile, err)
+		validate.log(5008, gzFile, err)
 		return false
 	}
 	defer reader.Close()
-	v.validateLines(reader)
+	validate.validateLines(reader)
 	return true
 }
 
 // ----------------------------------------------------------------------------
 
 // validate that each line read from the reader is a valid record
-func (v *ValidateImpl) validateLines(reader io.Reader) {
+func (validate *BasicValidate) validateLines(reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 	totalLines := 0
 	noRecordID := 0
@@ -231,17 +238,18 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 			valid, err := record.Validate(str)
 			if !valid {
 				if err != nil {
-					if strings.Contains(err.Error(), "RECORD_ID") {
-						v.log(3005, totalLines)
+					switch {
+					case strings.Contains(err.Error(), "RECORD_ID"):
+						validate.log(3005, totalLines)
 						noRecordID++
-					} else if strings.Contains(err.Error(), "DATA_SOURCE") {
-						v.log(3006, totalLines)
+					case strings.Contains(err.Error(), "DATA_SOURCE"):
+						validate.log(3006, totalLines)
 						noDataSource++
-					} else if strings.Contains(err.Error(), "not well formed") {
-						v.log(3007, totalLines)
+					case strings.Contains(err.Error(), "not well formed"):
+						validate.log(3007, totalLines)
 						malformed++
-					} else {
-						v.log(3008, totalLines)
+					default:
+						validate.log(3008, totalLines)
 						badRecord++
 					}
 				}
@@ -249,45 +257,43 @@ func (v *ValidateImpl) validateLines(reader io.Reader) {
 		}
 	}
 	if noRecordID > 0 {
-		v.log(3001, noRecordID)
+		validate.log(3001, noRecordID)
 	}
 	if noDataSource > 0 {
-		v.log(3002, noDataSource)
+		validate.log(3002, noDataSource)
 	}
 	if malformed > 0 {
-		v.log(3003, malformed)
+		validate.log(3003, malformed)
 	}
 	if badRecord > 0 {
-		v.log(3004, badRecord)
+		validate.log(3004, badRecord)
 	}
-	v.log(2210, totalLines, noRecordID+noDataSource+malformed+badRecord)
+	validate.log(2210, totalLines, noRecordID+noDataSource+malformed+badRecord)
 }
 
 // ----------------------------------------------------------------------------
-// Logging --------------------------------------------------------------------
-
+// Logging
 // ----------------------------------------------------------------------------
-// logger methods
 
 // Get the Logger singleton.
-func (v *ValidateImpl) getLogger() logging.LoggingInterface {
-	var err error = nil
-	if v.logger == nil {
+func (validate *BasicValidate) getLogger() logging.Logging {
+	var err error
+	if validate.logger == nil {
 		options := []interface{}{
 			&logging.OptionCallerSkip{Value: 4},
 		}
-		v.logger, err = logging.NewSenzingToolsLogger(ComponentId, IDMessages, options...)
+		validate.logger, err = logging.NewSenzingLogger(ComponentID, IDMessages, options...)
 		if err != nil {
 			panic(err)
 		}
 	}
-	return v.logger
+	return validate.logger
 }
 
 // Log message.
-func (v *ValidateImpl) log(messageNumber int, details ...interface{}) {
-	if v.JsonOutput {
-		v.getLogger().Log(messageNumber, details...)
+func (validate *BasicValidate) log(messageNumber int, details ...interface{}) {
+	if validate.JSONOutput {
+		validate.getLogger().Log(messageNumber, details...)
 	} else {
 		fmt.Println(fmt.Sprintf(IDMessages[messageNumber], details...))
 	}
