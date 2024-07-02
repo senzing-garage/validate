@@ -36,7 +36,6 @@
         --log-level DEBUG
     ```
 
-
 ### Using environment variables
 
 1. :pencil2: Specify JSONL file URL using environment variable.
@@ -72,8 +71,6 @@
     export SENZING_TOOLS_LOG_LEVEL=DEBUG
     senzing-tools validate
     ```
-
-
 
 ## Examples of Docker
 
@@ -122,5 +119,3 @@
         --rm \
         senzing/senzing-tools
     ```
-
-

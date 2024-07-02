@@ -73,13 +73,13 @@ func PreRun(cobraCommand *cobra.Command, args []string) {
 
 // Used in construction of cobra.Command
 func RunE(_ *cobra.Command, _ []string) error {
-	var err error = nil
+	var err error
 	ctx := context.Background()
 
-	validator := &validate.ValidateImpl{
+	validator := &validate.BasicValidate{
 		InputFileType: viper.GetString(option.InputFileType.Arg),
 		InputURL:      viper.GetString(option.InputURL.Arg),
-		JsonOutput:    viper.GetBool(option.JSONOutput.Arg),
+		JSONOutput:    viper.GetBool(option.JSONOutput.Arg),
 		LogLevel:      viper.GetString(option.LogLevel.Arg),
 	}
 
