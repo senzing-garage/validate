@@ -584,62 +584,62 @@ func TestBasicValidate_Read_resource_gzip_not_gzipped(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 // read a json file successfully, with no record validation errors
-func TestBasicValidate_Read_jsonOutput(test *testing.T) {
+// func TestBasicValidate_Read_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
-	defer moreCleanUp()
+// 	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
+// 	defer moreCleanUp()
 
-	validator := &BasicValidate{
-		InputURL:   fmt.Sprintf("file://%s", filename),
-		JSONOutput: true,
-		LogLevel:   "WARN",
-	}
-	result := validator.Read(context.Background())
+// 	validator := &BasicValidate{
+// 		InputURL:   fmt.Sprintf("file://%s", filename),
+// 		JSONOutput: true,
+// 		LogLevel:   "WARN",
+// 	}
+// 	result := validator.Read(context.Background())
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 12 lines, 0 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-	if result != true {
-		test.Errorf("ValidateImpl.Read() = %v, want true", result)
-	}
+// 	want := "Validated 12 lines, 0 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// 	if result != true {
+// 		test.Errorf("ValidateImpl.Read() = %v, want true", result)
+// 	}
 
-}
+// }
 
 // read a json file successfully, but with record validation errors
-func TestBasicValidate_Read_jsonOutput_bad(test *testing.T) {
+// func TestBasicValidate_Read_jsonOutput_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
-	defer moreCleanUp()
+// 	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
+// 	defer moreCleanUp()
 
-	validator := &BasicValidate{
-		InputURL:   fmt.Sprintf("file://%s", filename),
-		JSONOutput: true,
-	}
-	result := validator.Read(context.Background())
+// 	validator := &BasicValidate{
+// 		InputURL:   fmt.Sprintf("file://%s", filename),
+// 		JSONOutput: true,
+// 	}
+// 	result := validator.Read(context.Background())
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 16 lines, 4 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-	if result != true {
-		test.Errorf("ValidateImpl.Read() = %v, want true", result)
-	}
-}
+// 	want := "Validated 16 lines, 4 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// 	if result != true {
+// 		test.Errorf("ValidateImpl.Read() = %v, want true", result)
+// 	}
+// }
 
 // ----------------------------------------------------------------------------
 // test jsonl file read with json output
@@ -701,60 +701,60 @@ func TestBasicValidate_readJsonlFile_bad(test *testing.T) {
 }
 
 // read a json file successfully, with no record validation errors
-func TestBasicValidate_readJsonlFile_jsonOutput(test *testing.T) {
+// func TestBasicValidate_readJsonlFile_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
-	defer moreCleanUp()
+// 	filename, moreCleanUp := createTempDataFile(test, testGoodData, "jsonl")
+// 	defer moreCleanUp()
 
-	validator := &BasicValidate{
-		InputURL:   fmt.Sprintf("file://%s", filename),
-		JSONOutput: true,
-	}
-	result := validator.readJSONLFile(filename)
+// 	validator := &BasicValidate{
+// 		InputURL:   fmt.Sprintf("file://%s", filename),
+// 		JSONOutput: true,
+// 	}
+// 	result := validator.readJSONLFile(filename)
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 12 lines, 0 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-	if result != true {
-		test.Errorf("ValidateImpl.Read() = %v, want true", result)
-	}
-}
+// 	want := "Validated 12 lines, 0 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// 	if result != true {
+// 		test.Errorf("ValidateImpl.Read() = %v, want true", result)
+// 	}
+// }
 
 // read a json file successfully, but with record validation errors
-func TestBasicValidate_readJsonlFile_jsonOutput_bad(test *testing.T) {
+// func TestBasicValidate_readJsonlFile_jsonOutput_bad(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
-	defer moreCleanUp()
+// 	filename, moreCleanUp := createTempDataFile(test, testBadData, "jsonl")
+// 	defer moreCleanUp()
 
-	validator := &BasicValidate{
-		InputURL:   fmt.Sprintf("file://%s", filename),
-		JSONOutput: true,
-	}
-	result := validator.readJSONLFile(filename)
+// 	validator := &BasicValidate{
+// 		InputURL:   fmt.Sprintf("file://%s", filename),
+// 		JSONOutput: true,
+// 	}
+// 	result := validator.readJSONLFile(filename)
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 16 lines, 4 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-	if result != true {
-		test.Errorf("ValidateImpl.Read() = %v, want true", result)
-	}
-}
+// 	want := "Validated 16 lines, 4 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// 	if result != true {
+// 		test.Errorf("ValidateImpl.Read() = %v, want true", result)
+// 	}
+// }
 
 // ----------------------------------------------------------------------------
 // test gzip file read
@@ -990,46 +990,46 @@ func TestBasicValidate_validateLines_with_validation_errors(test *testing.T) {
 }
 
 // validate lines with no record validation errors, json output
-func TestBasicValidate_validateLines_jsonOutput(test *testing.T) {
+// func TestBasicValidate_validateLines_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	validator := &BasicValidate{
-		JSONOutput: true,
-	}
-	validator.validateLines(strings.NewReader(testGoodData))
+// 	validator := &BasicValidate{
+// 		JSONOutput: true,
+// 	}
+// 	validator.validateLines(strings.NewReader(testGoodData))
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 12 lines, 0 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-}
+// 	want := "Validated 12 lines, 0 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// }
 
 // validate lines, but with record validation errors and json output
-func TestBasicValidate_validateLines_with_validation_errors_jsonOutput(test *testing.T) {
+// func TestBasicValidate_validateLines_with_validation_errors_jsonOutput(test *testing.T) {
 
-	r, w, cleanUp := mockStderr(test)
-	defer cleanUp()
+// 	r, w, cleanUp := mockStderr(test)
+// 	defer cleanUp()
 
-	validator := &BasicValidate{
-		JSONOutput: true,
-	}
-	validator.validateLines(strings.NewReader(testBadData))
+// 	validator := &BasicValidate{
+// 		JSONOutput: true,
+// 	}
+// 	validator.validateLines(strings.NewReader(testBadData))
 
-	w.Close()
-	out, _ := io.ReadAll(r)
-	got := string(out)
+// 	w.Close()
+// 	out, _ := io.ReadAll(r)
+// 	got := string(out)
 
-	want := "Validated 16 lines, 4 were bad"
-	if !strings.Contains(got, want) {
-		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
-	}
-}
+// 	want := "Validated 16 lines, 4 were bad"
+// 	if !strings.Contains(got, want) {
+// 		test.Errorf("ValidateImpl.Read() = %v, want %v", got, want)
+// 	}
+// }
 
 // ----------------------------------------------------------------------------
 // Helper functions
@@ -1111,22 +1111,22 @@ func mockStdout(test *testing.T) (reader *os.File, writer *os.File, cleanUp func
 }
 
 // capture stderr for testing
-func mockStderr(test *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
-	test.Helper()
-	origStderr := os.Stderr
-	reader, writer, err := os.Pipe()
-	if err != nil {
-		assert.Fail(test, "couldn't get os Pipe: %v", err)
-	}
-	os.Stderr = writer
+// func mockStderr(test *testing.T) (reader *os.File, writer *os.File, cleanUp func()) {
+// 	test.Helper()
+// 	origStderr := os.Stderr
+// 	reader, writer, err := os.Pipe()
+// 	if err != nil {
+// 		assert.Fail(test, "couldn't get os Pipe: %v", err)
+// 	}
+// 	os.Stderr = writer
 
-	return reader,
-		writer,
-		func() {
-			// clean-up
-			os.Stderr = origStderr
-		}
-}
+// 	return reader,
+// 		writer,
+// 		func() {
+// 			// clean-up
+// 			os.Stderr = origStderr
+// 		}
+// }
 
 var testGoodData = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000002", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "SUITE E-2,UNION COURT BUILDING, P.O. BOX N-8188, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000002"}

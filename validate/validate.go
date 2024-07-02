@@ -70,21 +70,21 @@ func (validate *BasicValidate) Read(ctx context.Context) bool {
 	switch {
 	case parsedURL.Scheme == "file":
 		switch {
-		case strings.HasSuffix(parsedURL.Path, "jsonl") || strings.ToUpper(validate.InputFileType) == "JSONL":
+		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
 			validate.log(2201)
 			return validate.readJSONLFile(parsedURL.Path)
-		case strings.HasSuffix(parsedURL.Path, "gz") || strings.ToUpper(validate.InputFileType) == "GZ":
+		case strings.HasSuffix(parsedURL.Path, "gz"), strings.ToUpper(validate.InputFileType) == "GZ":
 			validate.log(2203)
 			return validate.readGZIPFile(parsedURL.Path)
 		default:
 			validate.log(5011)
 		}
-	case parsedURL.Scheme == "http" || parsedURL.Scheme == "https":
+	case parsedURL.Scheme == "http", parsedURL.Scheme == "https":
 		switch {
-		case strings.HasSuffix(parsedURL.Path, "jsonl") || strings.ToUpper(validate.InputFileType) == "JSONL":
+		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
 			validate.log(2204)
 			return validate.readJSONLResource(validate.InputURL)
-		case strings.HasSuffix(parsedURL.Path, "gz") || strings.ToUpper(validate.InputFileType) == "GZ":
+		case strings.HasSuffix(parsedURL.Path, "gz"), strings.ToUpper(validate.InputFileType) == "GZ":
 			validate.log(2205)
 			return validate.readGZIPResource(validate.InputURL)
 		default:
