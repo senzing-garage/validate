@@ -202,4 +202,4 @@ this action moves the PR on the "Garage" project board to "Done".
 [senzing-factory/github-action-install-senzing-api]: https://github.com/senzing-factory/github-action-install-senzing-api
 [senzing-factory/github-action-make-go-tag]: https://github.com/senzing-factory/github-action-make-go-tag
 [super-linter]: https://github.com/super-linter/super-linter
-[testcoverage.yaml]:  ../coverage/README.md#testcoverageyaml
+[testcoverage.yaml]: ../coverage/README.md#testcoverageyaml
