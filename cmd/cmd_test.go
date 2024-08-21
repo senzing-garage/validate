@@ -14,9 +14,6 @@ import (
 // Test public functions
 // ----------------------------------------------------------------------------
 
-/*
- * The unit tests in this file simulate command line invocation.
- */
 func Test_Execute(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "--help"}
@@ -35,21 +32,11 @@ func Test_Execute_docs(test *testing.T) {
 	Execute()
 }
 
-// func Test_ExecuteCommand_NoInputURL(test *testing.T) {
-// 	cmd := RootCmd
-// 	outbuf := bytes.NewBufferString("")
-// 	errbuf := bytes.NewBufferString("")
-// 	cmd.SetOut(outbuf)
-// 	cmd.SetErr(errbuf)
-// 	cmd.SetArgs([]string{"--input-url", "none"})
-// 	err := RootCmd.Execute()
-// 	require.Error(test, err, "expected Execute() to generated an error")
-// 	stderr, err := io.ReadAll(errbuf)
-// 	require.NoError(test, err)
-// 	if !strings.Contains(string(stderr), "validation failed") {
-// 		test.Fatalf("expected input-url parameter error")
-// 	}
-// }
+func Test_Execute_help(test *testing.T) {
+	_ = test
+	os.Args = []string{"command-name", "--help"}
+	Execute()
+}
 
 func Test_ExecuteCommand_Help(test *testing.T) {
 	cmd := RootCmd
@@ -66,6 +53,42 @@ func Test_ExecuteCommand_Help(test *testing.T) {
 	if !strings.Contains(string(stdout), "Available Commands") {
 		test.Fatalf("expected help text")
 	}
+}
+
+func Test_PreRun(test *testing.T) {
+	_ = test
+	args := []string{"command-name", "--help"}
+	PreRun(RootCmd, args)
+}
+
+// func Test_RunE(test *testing.T) {
+// 	test.Setenv("SENZING_TOOLS_AVOID_SERVING", "true")
+// 	err := RunE(RootCmd, []string{})
+// 	require.NoError(test, err)
+// }
+
+// func Test_RootCmd(test *testing.T) {
+// 	_ = test
+// 	err := RootCmd.Execute()
+// 	require.NoError(test, err)
+// 	err = RootCmd.RunE(RootCmd, []string{})
+// 	require.NoError(test, err)
+// }
+
+func Test_completionCmd(test *testing.T) {
+	_ = test
+	err := completionCmd.Execute()
+	require.NoError(test, err)
+	err = completionCmd.RunE(completionCmd, []string{})
+	require.NoError(test, err)
+}
+
+func Test_docsCmd(test *testing.T) {
+	_ = test
+	err := docsCmd.Execute()
+	require.NoError(test, err)
+	err = docsCmd.RunE(docsCmd, []string{})
+	require.NoError(test, err)
 }
 
 // ----------------------------------------------------------------------------
@@ -86,7 +109,7 @@ func Test_docsAction_badDir(test *testing.T) {
 }
 
 // ----------------------------------------------------------------------------
-// Utiity functions
+// Utility functions
 // ----------------------------------------------------------------------------
 
 func touchFile(name string) error {

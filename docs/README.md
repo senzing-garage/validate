@@ -1,5 +1,8 @@
 # validate
 
-Placeholder for [GitHub pages](https://pages.github.com/).
+Placeholder for [GitHub pages].
 
-See [https://hub.senzing.com/validate](https://hub.senzing.com/validate).
+See [GitHub page].
+
+[GitHub page]: https://garage.senzing.com/validate
+[GitHub pages]: https://pages.github.com/
