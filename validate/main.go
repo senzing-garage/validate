@@ -25,7 +25,7 @@ const Prefix = "validate: "
 // Variables
 // ----------------------------------------------------------------------------
 
-// Message templates for g2config implementations.
+// Message templates for szconfig implementations.
 var IDMessages = map[int]string{
 	2200: Prefix + "Validating URL string: %s",
 	2201: Prefix + "Validating as a JSONL file.",
