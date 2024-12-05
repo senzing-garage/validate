@@ -125,7 +125,7 @@ This usage shows how to validate a file with a Docker container.
 1. Related artifacts:
     1. [DockerHub]
 
-[SDK documentation]: https://pkg.go.dev/github.com/senzing-garage/template-go
+[SDK documentation]: https://pkg.go.dev/github.com/senzing-garage/validate
 [Development]: docs/development.md
 [DockerHub]: https://hub.docker.com/r/senzing/template-go
 [Errors]: docs/errors.md
