@@ -117,7 +117,7 @@ This usage shows how to validate a file with a Docker container.
 
 ## References
 
-1. [API documentation]
+1. [SDK documentation]
 1. [Development]
 1. [Errors]
 1. [Examples]
@@ -125,7 +125,7 @@ This usage shows how to validate a file with a Docker container.
 1. Related artifacts:
     1. [DockerHub]
 
-[API documentation]: https://pkg.go.dev/github.com/senzing-garage/template-go
+[SDK documentation]: https://pkg.go.dev/github.com/senzing-garage/template-go
 [Development]: docs/development.md
 [DockerHub]: https://hub.docker.com/r/senzing/template-go
 [Errors]: docs/errors.md
