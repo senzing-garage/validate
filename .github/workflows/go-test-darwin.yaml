@@ -7,12 +7,12 @@ permissions:
 
 jobs:
   go-test-darwin:
-    name: "Go test with OS: ${{ matrix.os }}; Go: ${{ matrix.go }}"
-    runs-on: ${{ matrix.os }}
+    name: "Go test with Senzing: ${{ matrix.senzingsdk-version }}; OS: macos-latest; Go: ${{ matrix.go }}"
+    runs-on: macos-latest
     strategy:
       matrix:
         go: ["1.21"]
-        os: [macos-latest]
+        senzingsdk-version: [staging-v4]
 
     steps:
       - name: Checkout repository
