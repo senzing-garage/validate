@@ -67,8 +67,8 @@ func (validate *BasicValidate) Read(ctx context.Context) bool {
 		validate.log(5001, err)
 		return false
 	}
-	switch {
-	case parsedURL.Scheme == "file":
+	switch parsedURL.Scheme {
+	case "file":
 		switch {
 		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
 			validate.log(2201)
@@ -79,7 +79,7 @@ func (validate *BasicValidate) Read(ctx context.Context) bool {
 		default:
 			validate.log(5011)
 		}
-	case parsedURL.Scheme == "http", parsedURL.Scheme == "https":
+	case "http", "https":
 		switch {
 		case strings.HasSuffix(parsedURL.Path, "jsonl"), strings.ToUpper(validate.InputFileType) == "JSONL":
 			validate.log(2204)

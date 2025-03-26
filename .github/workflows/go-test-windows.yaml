@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        go: ["1.21"]
+        go: ["1.24"]
         senzingsdk-version: [staging-v4]
 
     steps:
