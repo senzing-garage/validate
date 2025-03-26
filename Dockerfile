@@ -58,7 +58,7 @@ COPY ./rootfs /
 
 # Copy files from prior stage.
 
-COPY --from=builder /output/linux-amd64/validate /app/validate
+COPY --from=builder /output/linux/validate /app/validate
 
 # Run as non-root container
 
