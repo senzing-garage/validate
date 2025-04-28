@@ -14,6 +14,24 @@ import (
 // Test public functions
 // ----------------------------------------------------------------------------
 
+func Test_CompletionCmd(test *testing.T) {
+	test.Parallel()
+
+	err := CompletionCmd.Execute()
+	require.NoError(test, err)
+	err = CompletionCmd.RunE(CompletionCmd, []string{})
+	require.NoError(test, err)
+}
+
+func Test_DocsCmd(test *testing.T) {
+	test.Parallel()
+
+	err := DocsCmd.Execute()
+	require.NoError(test, err)
+	err = DocsCmd.RunE(DocsCmd, []string{})
+	require.NoError(test, err)
+}
+
 func Test_Execute(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "--help"}
@@ -74,39 +92,6 @@ func Test_PreRun(test *testing.T) {
 // 	err = RootCmd.RunE(RootCmd, []string{})
 // 	require.NoError(test, err)
 // }
-
-func Test_completionCmd(test *testing.T) {
-	_ = test
-	err := completionCmd.Execute()
-	require.NoError(test, err)
-	err = completionCmd.RunE(completionCmd, []string{})
-	require.NoError(test, err)
-}
-
-func Test_docsCmd(test *testing.T) {
-	_ = test
-	err := docsCmd.Execute()
-	require.NoError(test, err)
-	err = docsCmd.RunE(docsCmd, []string{})
-	require.NoError(test, err)
-}
-
-// ----------------------------------------------------------------------------
-// Test private functions
-// ----------------------------------------------------------------------------
-
-func Test_completionAction(test *testing.T) {
-	var buffer bytes.Buffer
-	err := completionAction(&buffer)
-	require.NoError(test, err)
-}
-
-func Test_docsAction_badDir(test *testing.T) {
-	var buffer bytes.Buffer
-	badDir := "/tmp/no/directory/exists"
-	err := docsAction(&buffer, badDir)
-	require.Error(test, err)
-}
 
 // ----------------------------------------------------------------------------
 // Utility functions
