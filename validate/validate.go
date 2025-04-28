@@ -120,7 +120,7 @@ func (validate *BasicValidate) SetLogLevel(ctx context.Context, logLevelName str
 }
 
 // ----------------------------------------------------------------------------
-// Internal methods
+// Private methods
 //  	response, err := http.Get(jsonURL) // #nosec:G107
 // ----------------------------------------------------------------------------
 

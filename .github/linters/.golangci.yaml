@@ -11,7 +11,7 @@ linters:
     - containedctx
     - contextcheck
     - copyloopvar
-    # - cyclop
+    - cyclop
     - decorder
     # - depguard
     - dogsled
@@ -122,6 +122,8 @@ linters:
       - builtin$
       - examples$
   settings:
+    cyclop:
+      max-complexity: 15
     depguard:
       rules:
         prevent_unmaintained_packages:
