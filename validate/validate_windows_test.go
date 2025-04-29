@@ -887,7 +887,7 @@ func TestValidateImpl_readStdin(t *testing.T) {
 	}()
 
 	validator := &BasicValidate{}
-	result := validator.readStdin()
+	result := validator.ReadStdin()
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -925,7 +925,7 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 	}()
 
 	validator := &BasicValidate{}
-	result := validator.readStdin()
+	result := validator.ReadStdin()
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -950,7 +950,7 @@ func TestValidateImpl_validateLines(t *testing.T) {
 	defer cleanUp()
 
 	validator := &BasicValidate{}
-	validator.validateLines(strings.NewReader(testGoodData))
+	validator.ValidateLines(strings.NewReader(testGoodData))
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -968,7 +968,7 @@ func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
 	defer cleanUp()
 
 	validator := &BasicValidate{}
-	validator.validateLines(strings.NewReader(testBadData))
+	validator.ValidateLines(strings.NewReader(testBadData))
 
 	w.Close()
 	out, _ := io.ReadAll(r)
