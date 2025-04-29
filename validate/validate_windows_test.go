@@ -107,7 +107,6 @@ import (
 
 // attempt to read a jsonl file, but the input url is bad
 func TestValidateImpl_Read_bad_url(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -131,7 +130,6 @@ func TestValidateImpl_Read_bad_url(t *testing.T) {
 
 // attempt to read a jsonl file, but the input url isn't parsable
 func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -155,7 +153,6 @@ func TestValidateImpl_Read_bad_url_parse(t *testing.T) {
 
 // attempt to read a jsonl file, but the input url is not understood
 func TestValidateImpl_Read_url_drop_through(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -202,7 +199,6 @@ func TestValidateImpl_Read_url_drop_through(t *testing.T) {
 // }
 
 func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -868,7 +864,6 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 // ----------------------------------------------------------------------------
 
 func TestValidateImpl_readStdin(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -892,7 +887,7 @@ func TestValidateImpl_readStdin(t *testing.T) {
 	}()
 
 	validator := &BasicValidate{}
-	result := validator.readStdin()
+	result := validator.ReadStdin()
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -906,8 +901,8 @@ func TestValidateImpl_readStdin(t *testing.T) {
 		t.Errorf("BasicValidate.readStdin() = %v, want false", result)
 	}
 }
-func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
+func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
@@ -930,7 +925,7 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 	}()
 
 	validator := &BasicValidate{}
-	result := validator.readStdin()
+	result := validator.ReadStdin()
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -951,12 +946,11 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 
 // validate lines with no record validation errors
 func TestValidateImpl_validateLines(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &BasicValidate{}
-	validator.validateLines(strings.NewReader(testGoodData))
+	validator.ValidateLines(strings.NewReader(testGoodData))
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -970,12 +964,11 @@ func TestValidateImpl_validateLines(t *testing.T) {
 
 // validate lines, but with record validation errors
 func TestValidateImpl_validateLines_with_validation_errors(t *testing.T) {
-
 	r, w, cleanUp := mockStdout(t)
 	defer cleanUp()
 
 	validator := &BasicValidate{}
-	validator.validateLines(strings.NewReader(testBadData))
+	validator.ValidateLines(strings.NewReader(testBadData))
 
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -1092,7 +1085,6 @@ func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, 
 		Handler: fs,
 	}
 	return &server, &listener, port
-
 }
 
 // capture stdout for testing
@@ -1109,7 +1101,7 @@ func mockStdout(t *testing.T) (reader *os.File, writer *os.File, cleanUp func())
 	return reader,
 		writer,
 		func() {
-			//clean-up
+			// clean-up
 			os.Stdout = origStdout
 		}
 }
@@ -1127,7 +1119,7 @@ func mockStderr(t *testing.T) (reader *os.File, writer *os.File, cleanUp func())
 	return reader,
 		writer,
 		func() {
-			//clean-up
+			// clean-up
 			os.Stderr = origStderr
 		}
 }
@@ -1145,6 +1137,7 @@ var testGoodData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENT
 {"SOCIAL_HANDLE": "shuddersv", "DATE_OF_BIRTH": "16/7/1974", "ADDR_STATE": "NC", "ADDR_POSTAL_CODE": "257609", "ENTITY_TYPE": "TEST", "GENDER": "F", "srccode": "MDMPER", "RECORD_ID": "151110080", "DSRC_ACTION": "A", "ADDR_CITY": "Raleigh", "DRIVERS_LICENSE_NUMBER": "95", "PHONE_NUMBER": "984-881-8384", "NAME_LAST": "OBERMOELLER", "entityid": "151110080", "ADDR_LINE1": "3802 eBllevue RD", "DATA_SOURCE": "TEST"}
 {"SOCIAL_HANDLE": "battlesa", "ADDR_STATE": "LA", "ADDR_POSTAL_CODE": "70706", "NAME_FIRST": "DEVIN", "ENTITY_TYPE": "TEST", "GENDER": "M", "srccode": "MDMPER", "CC_ACCOUNT_NUMBER": "5018608175414044187", "RECORD_ID": "151267101", "DSRC_ACTION": "A", "ADDR_CITY": "Denham Springs", "DRIVERS_LICENSE_NUMBER": "614557601", "PHONE_NUMBER": "318-398-0649", "NAME_LAST": "LOVELL", "entityid": "151267101", "ADDR_LINE1": "8487 Ashley ", "DATA_SOURCE": "TEST"}
 `
+
 var testBadData string = `{"DATA_SOURCE": "ICIJ", "RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"DATA_SOURCE": "ICIJ", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
 {"RECORD_ID": "24000001", "ENTITY_TYPE": "ADDRESS", "RECORD_TYPE": "ADDRESS", "icij_source": "BAHAMAS", "icij_type": "ADDRESS", "COUNTRIES": [{"COUNTRY_OF_ASSOCIATION": "BHS"}], "ADDR_FULL": "ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NASSAU, BAHAMAS", "REL_ANCHOR_DOMAIN": "ICIJ_ID", "REL_ANCHOR_KEY": "24000001"}
