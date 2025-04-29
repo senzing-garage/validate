@@ -1,4 +1,4 @@
-package cmd
+package cmd_test
 
 import (
 	"bytes"
@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/senzing-garage/go-helpers/wraperror"
+	"github.com/senzing-garage/validate/cmd"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,53 +19,59 @@ import (
 func Test_CompletionCmd(test *testing.T) {
 	test.Parallel()
 
-	err := CompletionCmd.Execute()
+	err := cmd.CompletionCmd.Execute()
 	require.NoError(test, err)
-	err = CompletionCmd.RunE(CompletionCmd, []string{})
+	err = cmd.CompletionCmd.RunE(cmd.CompletionCmd, []string{})
 	require.NoError(test, err)
 }
 
 func Test_DocsCmd(test *testing.T) {
 	test.Parallel()
 
-	err := DocsCmd.Execute()
+	err := cmd.DocsCmd.Execute()
 	require.NoError(test, err)
-	err = DocsCmd.RunE(DocsCmd, []string{})
+	err = cmd.DocsCmd.RunE(cmd.DocsCmd, []string{})
 	require.NoError(test, err)
 }
 
 func Test_Execute(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "--help"}
-	Execute()
+
+	cmd.Execute()
 }
 
 func Test_Execute_completion(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "completion"}
-	Execute()
+
+	cmd.Execute()
 }
 
 func Test_Execute_docs(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "docs"}
-	Execute()
+
+	cmd.Execute()
 }
 
 func Test_Execute_help(test *testing.T) {
 	_ = test
 	os.Args = []string{"command-name", "--help"}
-	Execute()
+
+	cmd.Execute()
 }
 
 func Test_ExecuteCommand_Help(test *testing.T) {
-	cmd := RootCmd
+	cmd := cmd.RootCmd
 	outbuf := bytes.NewBufferString("")
 	errbuf := bytes.NewBufferString("")
+
 	cmd.SetOut(outbuf)
 	cmd.SetErr(errbuf)
 	cmd.SetArgs([]string{"--help"})
-	err := RootCmd.Execute()
+
+	err := cmd.Execute()
 	require.NoError(test, err)
 	stdout, err := io.ReadAll(outbuf)
 	require.NoError(test, err)
@@ -76,7 +84,7 @@ func Test_ExecuteCommand_Help(test *testing.T) {
 func Test_PreRun(test *testing.T) {
 	_ = test
 	args := []string{"command-name", "--help"}
-	PreRun(RootCmd, args)
+	cmd.PreRun(cmd.RootCmd, args)
 }
 
 // func Test_RunE(test *testing.T) {
@@ -98,9 +106,12 @@ func Test_PreRun(test *testing.T) {
 // ----------------------------------------------------------------------------
 
 func touchFile(name string) error {
-	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0o644)
 	if err != nil {
-		return err
+		return wraperror.Errorf(err, "touchFile.os.OpenFile error: %w", err)
 	}
-	return file.Close()
+
+	err = file.Close()
+
+	return wraperror.Errorf(err, "touchFile error: %w", err)
 }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/senzing-garage/go-cmdhelping/cmdhelper"
 	"github.com/senzing-garage/go-cmdhelping/option"
+	"github.com/senzing-garage/go-helpers/wraperror"
 	"github.com/senzing-garage/validate/validate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,6 +44,8 @@ var ContextVariablesForMultiPlatform = []option.ContextVariable{
 }
 
 var ContextVariables = append(ContextVariablesForMultiPlatform, ContextVariablesForOsArch...)
+
+var errPackage = errors.New("cmd")
 
 // ----------------------------------------------------------------------------
 // Command
@@ -79,6 +82,7 @@ func PreRun(cobraCommand *cobra.Command, args []string) {
 // Used in construction of cobra.Command.
 func RunE(_ *cobra.Command, _ []string) error {
 	var err error
+
 	ctx := context.Background()
 
 	validator := &validate.BasicValidate{
@@ -89,7 +93,7 @@ func RunE(_ *cobra.Command, _ []string) error {
 	}
 
 	if !validator.Read(ctx) {
-		err = errors.New("validation failed")
+		err = wraperror.Errorf(errPackage, "validation failed. error: %w", errPackage)
 	}
 
 	return err
