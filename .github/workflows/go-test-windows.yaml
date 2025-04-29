@@ -30,6 +30,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Run go test raw
+        run: |
+          go test -v -p 1 ./...
+
       - name: Run go test
         run: |
           go test -json -v -p 1 -coverprofile=cover -covermode=atomic -coverpkg=./... ./... 2>&1 | tee "C:\Temp\gotest.log" | gotestfmt
