@@ -121,7 +121,7 @@ func (validate *BasicValidate) ReadJSONLResource(jsonURL string) bool {
 func (validate *BasicValidate) ReadJSONLFile(jsonFile string) bool {
 	jsonFile = filepath.Clean(jsonFile)
 
-	file, err := os.Open(jsonFile)
+	file, err := os.Open(filepath.Clean(jsonFile))
 	if err != nil {
 		validate.log(5004, jsonFile, err)
 
@@ -190,7 +190,7 @@ func (validate *BasicValidate) ReadGZIPResource(gzURL string) bool {
 func (validate *BasicValidate) ReadGZIPFile(gzFile string) bool {
 	gzFile = filepath.Clean(gzFile)
 
-	gzipfile, err := os.Open(gzFile)
+	gzipfile, err := os.Open(filepath.Clean(gzFile))
 	if err != nil {
 		validate.log(5007, gzFile, err)
 

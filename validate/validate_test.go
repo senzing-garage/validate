@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -209,7 +210,7 @@ func TestBasicValidate_Read_stdin_unpipe_error(test *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		test.Fatal(err)
 	}
@@ -835,7 +836,7 @@ func TestBasicValidate_readStdin(test *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		test.Fatal(err)
 	}
@@ -871,7 +872,7 @@ func TestBasicValidate_readStdin_unpipe_error(test *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		test.Fatal(err)
 	}
