@@ -108,10 +108,10 @@ func Test_PreRun(test *testing.T) {
 func touchFile(name string) error {
 	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0o644)
 	if err != nil {
-		return wraperror.Errorf(err, "touchFile.os.OpenFile error: %w", err)
+		return wraperror.Errorf(err, "os.OpenFile(%s)", name)
 	}
 
 	err = file.Close()
 
-	return wraperror.Errorf(err, "touchFile error: %w", err)
+	return wraperror.Errorf(err, wraperror.NoMessage)
 }

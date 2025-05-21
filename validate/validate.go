@@ -82,14 +82,14 @@ func (validate *BasicValidate) SetLogLevel(ctx context.Context, logLevelName str
 	// Verify value of logLevelName.
 
 	if !logging.IsValidLogLevelName(logLevelName) {
-		return wraperror.Errorf(errPackage, "invalid error level: %s error: %w", logLevelName, errPackage)
+		return wraperror.Errorf(errForPackage, "invalid error level: %s", logLevelName)
 	}
 
 	// Set ValidateImpl log level.
 
 	err = validate.getLogger().SetLogLevel(logLevelName)
 
-	return wraperror.Errorf(err, "validate.SetLogLevel error: %w", err)
+	return wraperror.Errorf(err, wraperror.NoMessage)
 }
 
 // ----------------------------------------------------------------------------

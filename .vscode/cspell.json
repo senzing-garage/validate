@@ -66,11 +66,12 @@
     ".dockerignore",
     ".git/*",
     ".github/linters/.golangci.yaml",
-    ".history/*",
     ".gitignore",
+    ".history/*",
     "**/*.go",
     "**/*.mod",
     "**/*.sum",
+    "bearer.ignore",
     "Makefile"
   ]
 }

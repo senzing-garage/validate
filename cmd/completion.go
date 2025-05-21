@@ -17,7 +17,7 @@ var CompletionCmd = &cobra.Command{
 	Long: `To load completions, run:
 source < (validate completion)
 
-To load completions automaticallon on login, add this line to your .bashrc file:
+To load completions automatically on login, add this line to your .bashrc file:
 source < (validate completion)
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
