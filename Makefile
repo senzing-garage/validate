@@ -76,6 +76,7 @@ dependencies-for-development: dependencies-for-development-osarch-specific
 	@go install github.com/vladopajic/go-test-coverage/v2@latest
 	@go install golang.org/x/tools/cmd/godoc@latest
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
+	@go install mvdan.cc/gofumpt@latest
 	@sudo npm install -g cspell@latest
 
 
@@ -248,6 +249,11 @@ update-pkg-cache:
 # -----------------------------------------------------------------------------
 # Specific programs
 # -----------------------------------------------------------------------------
+
+.PHONY: bearer
+bearer:
+	@bearer scan --config-file .github/linters/bearer.yml .
+
 
 .PHONY: cspell
 cspell:

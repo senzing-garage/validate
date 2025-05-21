@@ -82,14 +82,14 @@ func (validate *BasicValidate) SetLogLevel(ctx context.Context, logLevelName str
 	// Verify value of logLevelName.
 
 	if !logging.IsValidLogLevelName(logLevelName) {
-		return wraperror.Errorf(errPackage, "invalid error level: %s error: %w", logLevelName, errPackage)
+		return wraperror.Errorf(errForPackage, "invalid error level: %s", logLevelName)
 	}
 
 	// Set ValidateImpl log level.
 
 	err = validate.getLogger().SetLogLevel(logLevelName)
 
-	return wraperror.Errorf(err, "validate.SetLogLevel error: %w", err)
+	return wraperror.Errorf(err, wraperror.NoMessage)
 }
 
 // ----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ func (validate *BasicValidate) ReadJSONLResource(jsonURL string) bool {
 func (validate *BasicValidate) ReadJSONLFile(jsonFile string) bool {
 	jsonFile = filepath.Clean(jsonFile)
 
-	file, err := os.Open(jsonFile)
+	file, err := os.Open(filepath.Clean(jsonFile))
 	if err != nil {
 		validate.log(5004, jsonFile, err)
 
@@ -190,7 +190,7 @@ func (validate *BasicValidate) ReadGZIPResource(gzURL string) bool {
 func (validate *BasicValidate) ReadGZIPFile(gzFile string) bool {
 	gzFile = filepath.Clean(gzFile)
 
-	gzipfile, err := os.Open(gzFile)
+	gzipfile, err := os.Open(filepath.Clean(gzFile))
 	if err != nil {
 		validate.log(5007, gzFile, err)
 

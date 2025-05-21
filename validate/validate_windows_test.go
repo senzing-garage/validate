@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -208,7 +209,7 @@ func TestValidateImpl_Read_stdin_unpipe_error(t *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -873,7 +874,7 @@ func TestValidateImpl_readStdin(t *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -912,7 +913,7 @@ func TestValidateImpl_readStdin_unpipe_error(t *testing.T) {
 	origStdin := os.Stdin
 	defer func() { os.Stdin = origStdin }()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/senzing-garage/go-helpers/wraperror"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
@@ -19,15 +20,15 @@ var DocsCmd = &cobra.Command{
 		_ = args
 		dir, err := cmd.Flags().GetString("dir")
 		if err != nil {
-			return fmt.Errorf("getting 'dir' value: %w", err)
+			return wraperror.Errorf(err, "getting 'dir' value")
 		}
 		if dir == "" {
 			if dir, err = os.MkdirTemp("", "validate"); err != nil {
-				return fmt.Errorf("constructing cobra.Command: %w", err)
+				return wraperror.Errorf(err, "constructing cobra.Command")
 			}
 		}
 
-		return docsAction(os.Stdout, dir)
+		return DocsAction(os.Stdout, dir)
 	},
 }
 
@@ -36,13 +37,13 @@ func init() {
 	DocsCmd.Flags().StringP("dir", "d", "", "Destination directory for docs")
 }
 
-func docsAction(out io.Writer, dir string) error {
+func DocsAction(out io.Writer, dir string) error {
 	if err := doc.GenMarkdownTree(RootCmd, dir); err != nil {
-		return fmt.Errorf("DocsAction: %w", err)
+		return wraperror.Errorf(err, "DocsAction")
 	}
 
 	if _, err := fmt.Fprintf(out, "Documentation successfully created in %s\n", dir); err != nil {
-		return fmt.Errorf("printing succsss: %w", err)
+		return wraperror.Errorf(err, "printing succsss")
 	}
 
 	return nil
