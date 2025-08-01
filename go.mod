@@ -1,9 +1,9 @@
 module github.com/senzing-garage/validate
 
-go 1.24
+go 1.24.4
 
 require (
-	github.com/senzing-garage/go-cmdhelping v0.3.6
+	github.com/senzing-garage/go-cmdhelping v0.3.7
 	github.com/senzing-garage/go-helpers v0.6.13
 	github.com/senzing-garage/go-logging v1.5.3
 	github.com/spf13/cobra v1.9.1

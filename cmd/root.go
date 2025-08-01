@@ -36,7 +36,7 @@ const (
 // ----------------------------------------------------------------------------
 
 var ContextVariablesForMultiPlatform = []option.ContextVariable{
-	option.EngineInstanceName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
+	option.CoreInstanceName.SetDefault(fmt.Sprintf("validate-%d", time.Now().Unix())),
 	option.InputFileType,
 	option.InputURL,
 	option.JSONOutput,
