@@ -208,6 +208,7 @@ func TestBasicValidate_Read_stdin_unpipe_error(test *testing.T) {
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
+
 	defer func() { os.Stdin = origStdin }()
 
 	file, err := os.Open(filepath.Clean(filename))
@@ -834,6 +835,7 @@ func TestBasicValidate_readStdin(test *testing.T) {
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
+
 	defer func() { os.Stdin = origStdin }()
 
 	file, err := os.Open(filepath.Clean(filename))
@@ -870,6 +872,7 @@ func TestBasicValidate_readStdin_unpipe_error(test *testing.T) {
 	defer moreCleanUp()
 
 	origStdin := os.Stdin
+
 	defer func() { os.Stdin = origStdin }()
 
 	file, err := os.Open(filepath.Clean(filename))
@@ -1014,6 +1017,7 @@ func createTempGZIPDataFile(t *testing.T, content string) (string, func()) {
 
 	gf := gzip.NewWriter(tmpfile)
 	defer gf.Close()
+
 	fw := bufio.NewWriter(gf)
 	_, err = fw.WriteString(content)
 	require.NoError(t, err)
@@ -1032,9 +1036,19 @@ func createTempGZIPDataFile(t *testing.T, content string) (string, func()) {
 func serveResource(t *testing.T, filename string) (*http.Server, *net.Listener, int) {
 	t.Helper()
 
+	const (
+		keepAliveSeconds = 30
+	)
+
+	ctx := t.Context()
+
 	var port int
 
-	listener, err := net.Listen("tcp", ":0") // #nosec:G102
+	listenConfig := &net.ListenConfig{ //nolint
+		KeepAlive: keepAliveSeconds * time.Second,
+	}
+
+	listener, err := listenConfig.Listen(ctx, "tcp", ":0")
 	require.NoError(t, err)
 
 	listenerAddr, isOK := listener.Addr().(*net.TCPAddr)

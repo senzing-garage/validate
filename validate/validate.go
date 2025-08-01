@@ -110,6 +110,7 @@ func (validate *BasicValidate) ReadJSONLResource(jsonURL string) bool {
 	}
 
 	defer response.Body.Close()
+
 	validate.ValidateLines(response.Body)
 
 	return true
@@ -129,6 +130,7 @@ func (validate *BasicValidate) ReadJSONLFile(jsonFile string) bool {
 	}
 
 	defer file.Close()
+
 	validate.ValidateLines(file)
 
 	return true
@@ -179,6 +181,7 @@ func (validate *BasicValidate) ReadGZIPResource(gzURL string) bool {
 	}
 
 	defer reader.Close()
+
 	validate.ValidateLines(reader)
 
 	return true
@@ -207,6 +210,7 @@ func (validate *BasicValidate) ReadGZIPFile(gzFile string) bool {
 	}
 
 	defer reader.Close()
+
 	validate.ValidateLines(reader)
 
 	return true
