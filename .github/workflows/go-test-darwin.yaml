@@ -10,14 +10,17 @@ jobs:
     name: "Go test with Senzing: ${{ matrix.senzingsdk-version }}; OS: ${{ matrix.os }}; Go: ${{ matrix.go }}"
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         go: ["1.24"]
         os: [macos-latest]
-        senzingsdk-version: [staging-v4]
+        senzingsdk-version: [production-v4, staging-v4]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup go ${{ matrix.go }}
         uses: actions/setup-go@v6
@@ -31,20 +34,20 @@ jobs:
 
       - name: Run go test
         run: |
-          go test -json -v -p 1 -coverprofile=./cover.out -covermode=atomic -coverpkg=./... ./...  2>&1 | tee /tmp/gotest.log | gotestfmt
+          go test -exec "${GITHUB_WORKSPACE}/bin/macos_exec_dyld.sh" -json -v -p 1 -coverprofile="./cover-${{ matrix.senzingsdk-version }}.out" -covermode=atomic -coverpkg=./... ./...  2>&1 | tee "/tmp/gotest-${{ matrix.senzingsdk-version }}.log" | gotestfmt
 
       - name: Store coverage file
         uses: actions/upload-artifact@v4
         with:
-          name: cover.out
-          path: ./cover.out
+          name: "cover-${{ matrix.senzingsdk-version }}.out"
+          path: "./cover-${{ matrix.senzingsdk-version }}.out"
 
       - name: Upload test log
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-log
-          path: /tmp/gotest.log
+          name: "test-log-${{ matrix.senzingsdk-version }}"
+          path: "/tmp/gotest-${{ matrix.senzingsdk-version }}.log"
           if-no-files-found: error
 
   coverage:
@@ -53,3 +56,5 @@ jobs:
     uses: senzing-factory/build-resources/.github/workflows/go-coverage.yaml@v2
     with:
       coverage-config: ./.github/coverage/testcoverage-darwin.yaml
+      profile: "cover-production-v4.out,cover-staging-v4.out"
+
