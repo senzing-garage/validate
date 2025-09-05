@@ -7,16 +7,18 @@ permissions:
 
 jobs:
   go-test-windows:
-    name: "Go test with Senzing: ${{ matrix.senzingsdk-version }}; OS: windows-latest; Go: ${{ matrix.go }}"
+    name: "Go test with OS: windows-latest; Go: ${{ matrix.go }}"
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         go: ["1.24"]
-        senzingsdk-version: [staging-v4]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup go ${{ matrix.go }}
         uses: actions/setup-go@v6
