@@ -57,4 +57,3 @@ jobs:
     with:
       coverage-config: ./.github/coverage/testcoverage-darwin.yaml
       profile: "cover-production-v4.out,cover-staging-v4.out"
-
