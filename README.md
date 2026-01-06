@@ -14,7 +14,7 @@ Heck, it may not even be appropriate for your application of Senzing!
 [senzing-tools](https://github.com/senzing-garage/senzing-tools)
 suite of tools.
 This command validates that a JSONL file is properly formatted and each line
-contains sufficient key-value pairs for Senzing to each as a record.  It is
+contains sufficient key-value pairs for Senzing to each as a record. It is
 highly recommend that this code be taken and extended to validate JSONL records
 to meet your needs.
 
@@ -30,17 +30,17 @@ to meet your needs.
 ## Overview
 
 `validate` tests each line of a give JSONL file to ensure that it is valid
-JSON and contains two necessary key-value pairs:  `RECORD_ID` and `DATA_SOURCE`.
+JSON and contains two necessary key-value pairs: `RECORD_ID` and `DATA_SOURCE`.
 
 The file is given to `validate` with the command-line parameter `input-url` or
-as the environment variable `SENZING_TOOLS_INPUT_URL`.  Note this is a URL so
+as the environment variable `SENZING_TOOLS_INPUT_URL`. Note this is a URL so
 local files will need `file://` and remote files `http://` or `https://`. If
 the given file has the `.gz` extension, it will be treated as a compressed file
-JSONL file.  If the file has a `.jsonl` extension it will be treated
+JSONL file. If the file has a `.jsonl` extension it will be treated
 accordingly. If the file has another extension it will be rejected, unless the
 `input-file-type` or `SENZING_TOOLS_INPUT_FILE_TYPE` is set to `JSONL`.
 
-`validate` is intended as a starting point for other validation needs.  It
+`validate` is intended as a starting point for other validation needs. It
 should be fairly straight forward to extend it to test other JSON objects or
 extend it to other file types.
 
@@ -58,12 +58,12 @@ senzing-tools validate [flags]
 ```
 
 1. For options and flags:
-    1. [Online documentation](https://hub.senzing.com/senzing-tools/senzing-tools_validate.html)
-    1. Runtime documentation:
+   1. [Online documentation](https://hub.senzing.com/senzing-tools/senzing-tools_validate.html)
+   1. Runtime documentation:
 
-        ```console
-        senzing-tools validate --help
-        ```
+      ```console
+      senzing-tools validate --help
+      ```
 
 1. In addition to the following simple usage examples, there are additional [Examples](docs/examples.md).
 
@@ -72,10 +72,10 @@ senzing-tools validate [flags]
 1. :pencil2: Specify file URL using command line option.
    Example:
 
-    ```console
-    senzing-tools validate \
-        --input-url https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl
-    ```
+   ```console
+   senzing-tools validate \
+       --input-url https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl
+   ```
 
 1. See [Parameters](#parameters) for additional parameters.
 
@@ -84,10 +84,10 @@ senzing-tools validate [flags]
 1. :pencil2: Specify file URL using environment variable.
    Example:
 
-    ```console
-    export SENZING_TOOLS_INPUT_URL=https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl
-    senzing-tools validate
-    ```
+   ```console
+   export SENZING_TOOLS_INPUT_URL=https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl
+   senzing-tools validate
+   ```
 
 1. See [Parameters](#parameters) for additional parameters.
 
@@ -98,13 +98,13 @@ This usage shows how to validate a file with a Docker container.
 1. :pencil2: Run `senzing/senzing-tools`.
    Example:
 
-    ```console
-    docker run \
-        --env SENZING_TOOLS_COMMAND=validate \
-        --env SENZING_TOOLS_INPUT_URL=https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl \
-        --rm \
-        senzing/senzing-tools
-    ```
+   ```console
+   docker run \
+       --env SENZING_TOOLS_COMMAND=validate \
+       --env SENZING_TOOLS_INPUT_URL=https://public-read-access.s3.amazonaws.com/TestDataSets/SenzingTruthSet/truth-set-3.0.0.jsonl \
+       --rm \
+       senzing/senzing-tools
+   ```
 
 1. See [Parameters](#parameters) for additional parameters.
 
