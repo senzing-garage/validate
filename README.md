@@ -130,7 +130,6 @@ This usage shows how to validate a file with a Docker container.
 [DockerHub]: https://hub.docker.com/r/senzing/template-go
 [Errors]: docs/errors.md
 [Examples]: docs/examples.md
-[Go Package library]: https://pkg.go.dev
 [Go Reference Badge]: https://pkg.go.dev/badge/github.com/senzing-garage/template-go.svg
 [Go Report Card Badge]: https://goreportcard.com/badge/github.com/senzing-garage/template-go
 [Go Report Card]: https://goreportcard.com/report/github.com/senzing-garage/template-go
@@ -144,7 +143,6 @@ This usage shows how to validate a file with a Docker container.
 [golangci-lint.yaml]: https://github.com/senzing-garage/template-go/actions/workflows/golangci-lint.yaml
 [License Badge]: https://img.shields.io/badge/License-Apache2-brightgreen.svg
 [License]: https://github.com/senzing-garage/template-go/blob/main/LICENSE
-[main.go]: main.go
 [Package reference]: https://pkg.go.dev/github.com/senzing-garage/template-go
 [Senzing Garage]: https://github.com/senzing-garage
 [Senzing Quick Start guides]: https://docs.senzing.com/quickstart/
