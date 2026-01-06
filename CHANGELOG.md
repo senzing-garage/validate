@@ -9,6 +9,12 @@ This project adheres to [Semantic Versioning].
 
 -
 
+## [0.2.4] - 2026-01-06
+
+### Changed in 0.2.4
+
+- Update dependencies
+
 ## [0.2.3] - 2025-05-21
 
 ### Changed in 0.2.3
@@ -121,4 +127,3 @@ This project adheres to [Semantic Versioning].
 [CommonMark]: https://commonmark.org/
 [Keep a Changelog]: https://keepachangelog.com/
 [Semantic Versioning]: https://semver.org/
-

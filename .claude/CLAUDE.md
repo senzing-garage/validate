@@ -39,7 +39,7 @@ go test -run TestFunctionName ./cmd/
 
 ## Architecture
 
-```
+```console
 main.go           → Entry point, calls cmd.Execute()
 ├── cmd/          → CLI layer using Cobra/Viper
 │   ├── root.go   → Main command setup with flags
@@ -50,6 +50,7 @@ main.go           → Entry point, calls cmd.Execute()
 ```
 
 **Key Parameters:**
+
 - `--input-url` / `SENZING_TOOLS_INPUT_URL`: File URL (file://, http://, https://)
 - `--input-file-type` / `SENZING_TOOLS_INPUT_FILE_TYPE`: Override file type detection
 - `--json-output` / `SENZING_TOOLS_JSON_OUTPUT`: JSON output mode
@@ -60,6 +61,7 @@ main.go           → Entry point, calls cmd.Execute()
 ## Code Standards
 
 **Linting:** 100+ linters configured in `.github/linters/.golangci.yaml`
+
 - Max line length: 120 characters
 - Max cyclomatic complexity: 15
 - Do not use deprecated `io/ioutil` package (use `io` and `os` instead)
@@ -72,6 +74,7 @@ main.go           → Entry point, calls cmd.Execute()
 ## Dependencies
 
 Primary Senzing libraries:
+
 - `github.com/senzing-garage/go-cmdhelping` - Command helper utilities
 - `github.com/senzing-garage/go-helpers` - Helper utilities
 - `github.com/senzing-garage/go-logging` - Structured logging
