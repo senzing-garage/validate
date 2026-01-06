@@ -2,6 +2,11 @@ name: Go test darwin
 
 on: [pull_request, workflow_dispatch]
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 permissions: {}
 
 jobs:
@@ -15,6 +20,7 @@ jobs:
       matrix:
         go: ["1.24"]
         os: [macos-latest]
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository

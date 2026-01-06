@@ -123,7 +123,7 @@ This usage shows how to validate a file with a Docker container.
 1. [Examples]
 1. [Package reference]
 1. Related artifacts:
-    1. [DockerHub]
+   1. [DockerHub]
 
 [SDK documentation]: https://pkg.go.dev/github.com/senzing-garage/validate
 [Development]: docs/development.md
