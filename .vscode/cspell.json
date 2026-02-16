@@ -34,6 +34,7 @@
     "gotesttools",
     "govulncheck",
     "ICLA",
+    "kernelsam",
     "LDFLAGS",
     "OSARCH",
     "OSTYPE",
