@@ -10,7 +10,7 @@ ARG IMAGE_FINAL=senzing/senzingsdk-runtime:4.2.0@sha256:072ff062d9d3ee224e68848e
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_BUILDER} AS builder
-ENV REFRESHED_AT=2026-03-05
+ENV REFRESHED_AT=2026-03-09
 LABEL Name="senzing/go-builder" \
       Maintainer="support@senzing.com" \
       Version="0.1.0"
@@ -43,7 +43,7 @@ RUN mkdir -p /output \
 # -----------------------------------------------------------------------------
 
 FROM ${IMAGE_FINAL} AS final
-ENV REFRESHED_AT=2026-03-05
+ENV REFRESHED_AT=2026-03-09
 LABEL Name="senzing/template-go" \
       Maintainer="support@senzing.com" \
       Version="0.0.1"
