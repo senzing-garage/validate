@@ -13,6 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	commandName = "command-name"
+	helpFlag    = "--help"
+)
+
 // ----------------------------------------------------------------------------
 // Test public functions
 // ----------------------------------------------------------------------------
@@ -37,28 +42,28 @@ func Test_DocsCmd(test *testing.T) {
 
 func Test_Execute(test *testing.T) {
 	_ = test
-	os.Args = []string{"command-name", "--help"}
+	os.Args = []string{commandName, helpFlag}
 
 	cmd.Execute()
 }
 
 func Test_Execute_completion(test *testing.T) {
 	_ = test
-	os.Args = []string{"command-name", "completion"}
+	os.Args = []string{commandName, "completion"}
 
 	cmd.Execute()
 }
 
 func Test_Execute_docs(test *testing.T) {
 	_ = test
-	os.Args = []string{"command-name", "docs"}
+	os.Args = []string{commandName, "docs"}
 
 	cmd.Execute()
 }
 
 func Test_Execute_help(test *testing.T) {
 	_ = test
-	os.Args = []string{"command-name", "--help"}
+	os.Args = []string{commandName, helpFlag}
 
 	cmd.Execute()
 }
@@ -70,7 +75,7 @@ func Test_ExecuteCommand_Help(test *testing.T) {
 
 	cmd.SetOut(outbuf)
 	cmd.SetErr(errbuf)
-	cmd.SetArgs([]string{"--help"})
+	cmd.SetArgs([]string{helpFlag})
 
 	err := cmd.Execute()
 	require.NoError(test, err)
@@ -84,7 +89,7 @@ func Test_ExecuteCommand_Help(test *testing.T) {
 
 func Test_PreRun(test *testing.T) {
 	_ = test
-	args := []string{"command-name", "--help"}
+	args := []string{commandName, helpFlag}
 	cmd.PreRun(cmd.RootCmd, args)
 }
 

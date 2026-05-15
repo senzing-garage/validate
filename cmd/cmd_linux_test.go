@@ -12,7 +12,7 @@ import (
 
 func Test_PreRun_Linux(test *testing.T) {
 	_ = test
-	args := []string{"command-name"}
+	args := []string{commandName}
 	cmd.PreRun(cmd.RootCmd, args)
 }
 
