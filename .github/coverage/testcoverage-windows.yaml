@@ -12,18 +12,20 @@ profile: cover.out
 local-prefix: "github.com/org/project"
 
 # Holds coverage thresholds percentages, values should be in range [0-100]
+# Lowered for Go 1.27, which counts uncovered multi-line blocks as more statements.
+# On Windows, cmd.RunE and most file:// reads are not tested.
 threshold:
   # (optional; default 0)
   # The minimum coverage that each file should have
-  file: 40
+  file: 20
 
   # (optional; default 0)
   # The minimum coverage that each package should have
-  package: 40
+  package: 35
 
   # (optional; default 0)
   # The minimum total coverage project should have
-  total: 45
+  total: 40
 # Holds regexp rules which will override thresholds for matched files or packages
 # using their paths.
 #
