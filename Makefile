@@ -4,6 +4,10 @@
 
 include makefiles/osdetect.mk
 
+# Tool versions, shared across OS-specific makefiles.
+
+include makefiles/versions.mk
+
 # -----------------------------------------------------------------------------
 # Variables
 # -----------------------------------------------------------------------------
@@ -78,6 +82,7 @@ dependencies-for-development: dependencies-for-development-osarch-specific
 	@go install golang.org/x/tools/cmd/godoc@latest
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install mvdan.cc/gofumpt@latest
+	@docker-compose pull 2>/dev/null || true
 	@sudo npm install -g cspell@latest
 
 
@@ -161,6 +166,10 @@ run: run-osarch-specific
 
 .PHONY: test
 test: test-osarch-specific
+
+
+.PHONY: test-verbose
+test-verbose: test-verbose-osarch-specific
 
 
 .PHONY: docker-test

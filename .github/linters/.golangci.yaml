@@ -24,7 +24,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - exptostd
     - fatcontext
     - forbidigo
@@ -44,7 +44,7 @@ linters:
     - godox
     - goheader
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosec
     - gosmopolitan
@@ -130,7 +130,7 @@ linters:
     depguard:
       rules:
         prevent_unmaintained_packages:
-          list-mode: lax # allow unless explicitely denied
+          list-mode: lax # allow unless explicitly denied
           allow:
             - github.com/stretchr/testify/*
           deny:
@@ -138,8 +138,8 @@ linters:
               desc: "replaced by io and os packages since Go 1.16: https://tip.golang.org/doc/go1.16#ioutil"
     dupl:
       threshold: 175
-    exhaustruct:
-      exclude:
+    exhaustruct_v5:
+      ignore-patterns:
         - '.+/cobra\.Command$'
         - '.+/validate\.BasicValidate$'
         - '.+/http\.Server$'
@@ -149,7 +149,9 @@ linters:
         - empty
         - error
         - stdlib
-
+    mnd:
+      ignored-functions:
+        - '^logger\.Log$'
 formatters:
   enable:
     - gci
