@@ -1,4 +1,4 @@
-//go:build linux
+//go:build !windows
 
 package cmd_test
 
@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_PreRun_Linux(test *testing.T) {
+func Test_PreRun_NonWindows(test *testing.T) {
 	_ = test
 	args := []string{commandName}
 	cmd.PreRun(cmd.RootCmd, args)
 }
 
-func Test_RunE_Linux(test *testing.T) {
+func Test_RunE_NonWindows(test *testing.T) {
 	tempDir := test.TempDir()
 	inputFile := filepath.Join(tempDir, "move-cmd-input.jsonl")
 	err := touchFile(inputFile)
